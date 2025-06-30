@@ -17,25 +17,37 @@
 %
 % Compile with: xelatex -> biber -> xelatex -> xelatex
 
-\chapter{相关技术与工作}
-\section{ELF文件结构}
+\chapter{相关技术与工作 Some Related Foundational Technologies and Work}
+\section{ELF文件结构 ELF File Structure}
 ELF（Executable and Linkable Format）文件格式是目前类 Unix 操作系统（如 Linux、FreeBSD）中广泛采用的一种标准二进制格式，用于描述可执行文件、目标文件、共享库和内核转储文件。由于其良好的可扩展性与跨平台支持，ELF 格式被认为是现代操作系统中程序执行与链接的核心桥梁。一个典型的 ELF 文件主要包括以下四个关键结构：
+
+The ELF file format, the abbreviation for Executable and Linkable Format, is a standard binary format that is widely adopted in Unix-like operating systems such as Linux and FreeBSD for describing executable files, object files, shared libraries, and kernel dump files. Because of its superior extensibility and support among different platforms, the ELF format is defined as a core bridge for executing programs and linking libraries in modern operating systems. A typical ELF file primarily contains the following four critical structures:
 \begin{enumerate} [label=\arabic*)] 
 \item ELF 头（ELF Header）
 
 ELF 文件的开头是一个固定大小的 ELF 头部，用于描述整个文件的总体信息。它包含了魔数（magic number）用于识别 ELF 文件、目标机器架构（如 x86、ARM）、文件类型（可执行文件、共享对象或目标文件）、程序入口地址、程序头表偏移、节头表偏移、各个表的数量与大小等。操作系统的加载器首先读取这一部分信息来判断该文件是否为合法的 ELF 文件，并根据提供的偏移值进一步解析程序头和节头信息。
 
+ELF Header:
+The beginning of an ELF file contains a definite size ELF header that describes the file‘s information which includes the magic number for identifying ELF files, the target machine architecture such as x86 or ARM, the file type such as executable files or shared objects, the program entry point address, program header table offset, section header table offset, and respective tables’ number and size. When it is executed, the operation system loader first reads this section to determine whether the file is a valid ELF file or the file is only an invalid file whose file extension was changed and then analyzes the program header and section header information using the provided offsets.
+
+
 \item 程序头表（Program Header Table）
 
 程序头表是面向操作系统加载器的结构，主要描述程序运行时需要载入内存的“段”（Segment）。每一项描述了一个段的类型、在文件中的偏移、在内存中的虚拟地址、所需的权限（可读、可写、可执行）以及其大小等信息。例如，常见的代码段 .text、数据段 .data 等，都会在程序头表中有对应的段描述。加载器正是依据程序头表将相应部分映射至进程的地址空间中。
+
+The program header table is a structure targeting operation system loaders, primarily describing segments that are required to be loaded into memory when the program is executed. Each item of the program header table describes a segment's type, file offset, virtual address in memory, required permissions (readable, writable, executable), and size. For example, common code segments like .text and data segments like .data have relevant segment descriptions in the program header table. According to this table, the loader maps relevant sections into the address space of the executing process.
 
 \item 节（Section）
 
 节是编译和链接阶段使用的逻辑组织单元，用于存储源代码生成的不同类型的数据，如 .text（代码段）、.data（已初始化的数据段）、.bss（未初始化的数据段）、.rodata（只读数据）、.symtab（符号表）、.strtab（字符串表）、.debug（调试信息）等。节通常不会被直接加载进内存执行，而是由链接器使用，或被分析工具读取以进行二进制分析、反汇编和静态分析等任务。
 
+Sections are logical organization units that store different kinds of data generated from source code. They are used for compilation and linking phases. Section examples include .text (storage code), .data (storage initialized data), .bss (storage uninitialized data), .rodata (storage read-only data), .symtab (symbol table), .strtab (string table), and .debug (debug information). Sections are commonly not loaded directly into memory for execution but are used by linkers or read by analysis tools for operations like binary analysis, disassembly, and static analysis.
+
 \item 节头表（Section Header Table）
 
 节头表则是面向链接器和调试器的结构，它记录了每个节的元信息，如名称、类型、权限、文件偏移、地址、大小等。每一项对应一个节，操作系统或工具链通过节头表来快速定位和解析各节内容。在某些可执行文件中，节头表甚至可以被省略，以减小文件体积或增加反分析难度，但这不会影响程序的加载运行，因为程序的执行依赖的是程序头表，而非节信息。
+
+The section header table is a structure facing linkers and debuggers. It records metadata for each section, including its name, type, permissions, file offset, address, and size. Each item corresponds to a section. Operating systems and tool chains use the section header table to quickly locate and parse section contents. In some executable files, the section header table can be omitted to reduce file size or to increase disassembly difficulty. However, it does not affect program loading and executing because program execution relies on the program header table rather than section information.  
 
 \end{enumerate}
 
@@ -43,38 +55,50 @@ ELF 文件的开头是一个固定大小的 ELF 头部，用于描述整个文�
 	\centering
 	\includegraphics[width=0.75\textwidth]{figures/2.1}
 	% \caption[这里的文字将会显示在 listoffigure 中]{这里的文字将会显示在正文中}
-	\caption{ELF文件结构}\label{fig:2.1}
+	\caption{ELF文件结构 ELF File Structure}\label{fig:2.1}
 \end{figure}
 
-\section{恶意软件检测技术}
+\section{恶意软件检测技术 Malware Detection Technologies}
 
 随着信息技术的快速发展和应用系统的日益复杂，恶意软件在网络空间中的传播形式不断演化，攻击手段愈加隐蔽与智能化，传统的防护机制正面临严峻挑战。据全球网络安全厂商统计，2023年全球每天新增恶意软件样本超过50万个，其中近30\%的样本采用了变种、加壳、动态加载等手段以逃避检测，呈现出高度自动化和持续化的攻击特征。这些趋势表明，恶意软件检测正成为保障网络空间安全的关键技术环节。
 目前，恶意软件检测技术主要分为以下三类，如图\ref{fig:2.2}所示：
+With technology's rapid development and application systems' complexity enhancement, malware propagation forms in cyberspace continue to evolve, while attack techniques become more covert and intelligent. Traditional defense mechanisms face severe challenges. According to global cybersecurity companies, over 500,000 new malware samples emerged daily from all over the world in 2023, with nearly 30\% of them adopting methods such as mutation, packing, and dynamic loading to evade detection, demonstrating highly automated and consistent attack characteristics. These trends suggest that malware detection has become a critical technical link for ensuring cyberspace security.
+Currently, malware detection technologies are primarily classified into the following three types, which are expressed in Figure \ref{fig:2.2}:
 
 \begin{figure}[hbt]
 	\centering
 	\includegraphics[width=0.75\textwidth]{figures/2.2}
 	% \caption[这里的文字将会显示在 listoffigure 中]{这里的文字将会显示在正文中}
-	\caption{恶意软件检测方法分类}\label{fig:2.2}
+	\caption{恶意软件检测方法分类 Malware Detection Methods Classification}\label{fig:2.2}
 \end{figure}
 
 %\begin{enumerate} [label=(\arabic*)] 
-
-(1)静态分析方法
+ 
+(1)静态分析方法  Static Analysis Methods
 
 静态分析是最早应用于恶意代码检测的技术手段，主要通过对软件的二进制文件进行逆向工程分析，从中提取诸如特征码、字符串信息、导入表、节区结构、指令序列、操作码频率等静态特征，再使用签名匹配或机器学习方法进行分类判断。Kumar等\cite{kumar2019learning}通过组合PE头的原始值与派生值，并比较集成特征集与原始特征集，证明了基于前者的分类器能以较高准确度和较低成本检测和分类恶意软件。Yan等\cite{yan2019classifying}提出了一种利用深度图卷积神经网络对控制流图（CFG）进行嵌入的新型恶意软件分类系统，并在两个包含超过20,000个样本的大型数据集上验证了该系统的有效性。Corlatescu等\cite{corlatescu2023embersim}提出了基于静态分析的恶意软件检测框架，利用文件结构信息和元数据构建了EMBER基准数据集。Ling等\cite{ling2022malgraph}提出MalGraph，一种基于层次图神经网络的方法，用于鲁棒的Windows恶意软件检测，通过函数调用图和控制流图捕捉可执行文件的交互与结构语义。
 
+Static analysis is the earliest technique used for malicious code detection, which mainly first uses reverse engineering of software binary files to extract static features such as traits, string information, import tables, section structures, instruction sequences, and operation code frequencies, then uses signature matching or machine learning methods to classify and judge. Kumar et al. proved that classifiers based on combining raw and derived values of PE headers and comparing integrated feature sets against original feature sets can detect and classify malware with high accuracy\cite{kumar2019learning}. Yan et al. proposed a novel malware classification system using deep graph convolutional networks to embed control flow graphs (CFGs), validating its effectiveness on two large datasets that contain over 20,000 samples\cite{yan2019classifying}. Corlatescu et al. issued a static analysis-based malware detection framework and constructed the EMBER benchmark dataset based on file structure information and metadata\cite{corlatescu2023embersim}. Ling et al. raised MalGraph, a neural network method relying on hierarchical graph for robust Windows malware detection, capturing executable file interaction and structure semantics through function call graphs and control flow graphs\cite{ling2022malgraph}.
+
 该方法优点是速度快、资源消耗低，适合大规模样本初筛。但它的缺点也很明显：对经过加壳、混淆、代码插入等技术处理的恶意软件识别能力较弱，容易被绕过。
+
+This approach's advantages include high speed and low resource consumption, making it suitable for large-scale sample initial sifting. However, its weaknesses are also obvious, such as lacking the ability to recognize malware processed with packing, obfuscation, and code injection, which can make malware evade easily.
 
 (2)动态行为分析方法
 
 动态分析通过在虚拟沙箱或受控环境中执行可疑程序，监控其运行时的行为，包括系统调用序列、文件操作、注册表修改、网络通信等动态特征，以此判断程序的恶意性。Trizna等\cite{trizna2024nebula}提出了一种名为Nebula的自注意力Transformer架构，用于动态恶意软件分析。通过对行为报告进行标记化、过滤、归一化和编码，适配Transformer架构，并进行全面消融研究，评估系统组件对性能的影响。Bhat等\cite{bhat2023system}利用系统调用分析对Android应用进行动态行为分析，提取动态特征后，使用集成学习算法分类。Li等\cite{li2022novel}在安全虚拟环境中对软件API调用序列进行动态分析，并将这些序列转化为多种特征表示，使用深度学习模型（包括Bi-LSTM）进行分类。Chen等\cite{chen2022cruparamer}提出了基于参数增强的API序列学习方法，通过深度神经网络训练，具有较高的检测鲁棒性和泛化能力。Rohini等\cite{rohini2024magic}提出MAGIC方法，通过行为共现和回归分析量化恶意软件行为，实验结果显示MAGIC比传统方法更准确地反映签名的恶意程度，提高了恶意软件威胁的防御能力。
 
+Dynamic analysis executes suspicious programs in virtual sandboxes or controlled environments, monitoring their behaviors which include dynamic features such as system call sequences, file operations, registry modifications, and network communications when they are executed to determine whether the programs are malicious. Trizna et al. proposed Nebula, a self-attention Transformer architecture for dynamic malware analysis\cite{trizna2024nebula}. Through noting, filtering, normalizing, and encoding behavioral reports and adapting Transformer structure, they conducted comprehensive studies to evaluate system component effect on performance. Bhat et al. performed dynamic behavioral analysis on Android applications by system call analyzing, extracting dynamic features to use integrated learning algorithms for classification\cite{bhat2023system}. Li et al. dynamically analyzed software API call sequences in secure virtual environments, transformed these sequences into multiple feature expressions, and using deep learning models including Bi-LSTM to classify them\cite{li2022novel}. Chen et al. proposed an API sequence learning method based on parameter augmentation, which can achieve high detection robustness and generalization ability through deep neural network training\cite{chen2022cruparamer}. Rohini et al. raised MAGIC, which quantifies malware behaviors through behavioral co-occurrence and regression analysis\cite{rohini2024magic}. Experimental results showed MAGIC is more accurate in reflecting signature maliciousness than traditional methods, enhancing malware defense capabilities.
+
 这种方法更侧重于检测实际行为，因此在应对变种或混淆样本方面具有更好的鲁棒性。然而，其缺点在于分析开销较大，容易被延时执行或沙箱检测绕过。此外，一些高度针对性的APT攻击样本在沙箱中可能不会暴露其真实行为，从而导致漏报。
 
-(3)基于机器学习和深度学习融合的方法
+This method focuses more on detecting actual behaviors, which means it is robust against mutation or obfuscated samples. However, it suffers from higher resource consumption and remains vulnerable to being evaded through delayed execution or anti sandbox detection techniques. Furthermore, some highly targeted APT attack samples may not reveal true behaviors in virtual sandboxes, which leads to false negatives.
+
+(3)基于机器学习和深度学习融合的方法 Methods Based on Combing Machine Learning and Deep Learning
 
 近年来，随着人工智能技术的快速发展，越来越多的研究者将机器学习与深度学习方法应用于恶意软件检测任务。通过从样本中提取静态或动态特征，再使用如支持向量机（SVM）、随机森林（RF）、卷积神经网络（CNN）、循环神经网络（RNN）等模型进行分类训练，已在多个公开数据集上取得了较好的检测效果。Ngo等\cite{ngo2023fast}提出了一种结合静态和动态特征的快速恶意软件检测方法，利用迁移学习提升检测效率。通过深度学习提取潜在特征表示，解决特征维度不一致的问题，并使用知识蒸馏技术将聚合特征的知识迁移到静态特征模型中，实现快速检测。Shar等\cite{shar2023experimental}从Android应用中提取14种特征，比较传统机器学习（如随机森林）和深度学习（如循环神经网络）在这些特征上的表现。Bashir等\cite{bashir2024hybrid}提取Android应用的静态和动态特征（如API调用和权限），并使用SVM、K-NN、NB及集成学习方法分类。
+
+Recently, with the rapid development of artificial intelligence, an increasing number of researchers adopt machine learning and deep learning methods to solve malware detection tasks. By extracting static or dynamic features from samples and training classification models such as Support Vector Machines (SVM), Random Forest (RF), Convolutional Neural Networks (CNN), and Recurrent Neural Networks (RNN), researchers achieved significant detection results on multiple public datasets. Ngo et al. introduced a rapid malware detection method combining static and dynamic features, enhancing detection efficiency via transfer learning\cite{ngo2023fast}. Through deep learning extracting latent characteristics to resolve feature dimension inconsistency problems and knowledge distillation, this method transfers aggregated feature knowledge to static feature models, which can achieve detect more rapidly. Shar et al. extracted 14 features from Android applications, comparing traditional machine learning methods such as random forest and deep learning methods such as recurrent neural networks performance on these features\cite{shar2023experimental}. Bashir et al. extracted static and dynamic features, such as API calls and permission, from Android applications, and classified them by using SVM, K-NN, Naive Bayes, and integrated learning methods\cite{bashir2024hybrid}.
 
 恶意软件检测技术正从传统的签名匹配逐渐迈向智能化、自适应的发展方向。Bensaoud和Kalita\cite{bensaoud2022deep}通过生成恶意软件的位图和PNG图像并输入深度学习模型进行分类，采用硬参数共享和软参数共享策略，成功检测使用各种混淆技术的恶意软件。Conti等\cite{conti2022few}提出了一种基于GEM图像的深度学习方法，结合灰度矩阵图像、GLCM纹理特征、马尔可夫图像和熵图像，用于较浅的CNN架构，提升了训练和分类效率。Mallik等\cite{mallik2022conrec}通过将恶意软件样本转为灰度图像，并利用卷积神经网络捕捉结构相似性，结合BiLSTM层和VGG16层的输出，进行恶意软件家族分类，表现出色。
 
