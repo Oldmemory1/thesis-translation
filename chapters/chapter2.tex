@@ -102,62 +102,105 @@ Recently, with the rapid development of artificial intelligence, an increasing n
 
 恶意软件检测技术正从传统的签名匹配逐渐迈向智能化、自适应的发展方向。Bensaoud和Kalita\cite{bensaoud2022deep}通过生成恶意软件的位图和PNG图像并输入深度学习模型进行分类，采用硬参数共享和软参数共享策略，成功检测使用各种混淆技术的恶意软件。Conti等\cite{conti2022few}提出了一种基于GEM图像的深度学习方法，结合灰度矩阵图像、GLCM纹理特征、马尔可夫图像和熵图像，用于较浅的CNN架构，提升了训练和分类效率。Mallik等\cite{mallik2022conrec}通过将恶意软件样本转为灰度图像，并利用卷积神经网络捕捉结构相似性，结合BiLSTM层和VGG16层的输出，进行恶意软件家族分类，表现出色。
 
+Malware detection technology is gradually evolving from traditional signature matching to intelligent and self-adaptive. Bensaoud and Kalita converted malware binaries into bitmap and PNG images for deep learning model classification\cite{bensaoud2022deep}. Through adapting hard parameters and soft parameters sharing strategies, they successfully detected malware using various disturbance techniques. Conti et al. proposed a deep learning method based on GEM images\cite{conti2022few}, combining grayscale matrix images, GLCM texture features, Markov images, and entropy images in shallower CNN architectures, which improves training and classification efficiency. Mallik et al. converted malware samples into grayscale images\cite{mallik2022conrec}, captured structural similarities through convolutional neural networks, and performed malware family classification by combining outputs from BiLSTM and VGG16 layers, achieving outstanding performance.
+
 尽管检测方法不断优化，但随着攻击者技术手段的日益多样化，现有检测系统仍难以全面覆盖所有威胁类型，尤其是对抗性样本的出现，进一步揭示了现有模型的脆弱性。因此，如何在保证检测准确率的同时，提升模型对抗攻击的鲁棒性，成为当前恶意软件检测领域的重要研究方向之一。
 
+Though detection methods are being optimized continuously, the condition that attacker techniques are getting more complex and diverse makes existing systems hardly cover all types of threats. The appearance of adversarial samples further exposes that current models are vulnerable. Therefore, enhancing model robustness against adversarial attacks while ensuring detection accuracy has been a crucial research direction in the current malware detection realm. 
+
 该方法具有一定的自适应能力和特征抽象能力，但其检测结果往往依赖于训练数据的分布一致性，面对对抗样本或新型威胁时仍存在鲁棒性不足的问题。
+
+This approach has adaptive capabilities and feature abstraction abilities, but detection results often depend on training data with distributional consistency, which makes it face insufficient robustness against adversarial samples or newly emerging threats.  
 %\end{enumerate}
 
-\section{对抗性恶意软件}
+\section{对抗性恶意软件 Adversarial Malware}
 近年来，随着深度学习技术在恶意软件检测中的广泛应用，基于神经网络的分类模型成为主流检测手段之一。然而，大量研究发现，深度神经网络虽然在标准测试样本上表现出色，却容易受到“对抗样本（Adversarial Examples）”的干扰。攻击者通过对输入数据添加轻微但精心设计的扰动，能够误导模型做出错误判断。这种攻击方式在图像识别、语音识别等领域已有广泛研究，并逐步扩展到网络安全领域，尤其是恶意软件检测。
+
+In recent years, with the widespread application of deep learning technologies in malware detection, classification models based on neural networks have become one of the prevalent detection tools. However, numerous studies have found that although deep neural networks perform well on standard test samples, they can be easily disturbed by adversarial examples. Attackers can mislead models into making wrong judgments by adding subtle but carefully designed disturbances to input data. This attack method has been extensively studied in realms such as image recognition and voice recognition and is gradually extending into cybersecurity, particularly the malware detection realm.
 
 所谓对抗性恶意软件（Adversarial Malware），是指攻击者在不破坏原有恶意功能的前提下，对恶意样本进行精细化扰动，使其在被检测时被误识为正常程序，从而绕过检测系统。这些扰动可以在代码层面（如指令插入、控制流调整）、结构层面（如节表改写、符号表扰动），或行为层面（如API调用序列伪装）实施，具有高度隐蔽性和针对性。
 
+Adversarial malware refers to malicious samples that attackers precisely disturb, with the premise that the original malicious sample functionalities are not broken, causing them to be misrecognized as benign software during detection and then evade detection systems. These disturbances can be implemented at code levels such as instruction insertion and control flow adjustment; at structural levels such as section table modification, symbol table perturbation; or at behavioral levels such as API call sequence pretense with high concealment and targeting specifically.
 
 与图像等静态数据不同，恶意软件样本具有复杂的执行语义和潜在行为逻辑，因此对抗性样本的生成不仅要保证样本在结构上的有效性，更要保持其原始攻击行为的可执行性。这一特点使得恶意软件领域的对抗样本生成问题更加复杂与挑战性更高。
+
+Unlike static data such as images, malware samples have complex execution semantics and latent behavioral logic. Therefore, generating adversarial samples for malware requires not only guaranteeing structural validity but also ensuring the original sample behaviors' executability. This characteristic makes adversarial sample generation considerably more complex and challenging in the malware realm.
 
 
 目前已有多种方法被提出用于生成对抗性恶意软件，主要包括以下几类：
 
+Currently, multiple methods have been proposed for generating adversarial malware, mainly including the following categories:
 
 基于梯度的扰动方法：如FGSM\cite{lupart2023study}（Fast Gradient Sign Method）、PGD\cite{bryniarski2021evading}（Projected Gradient Descent）等方法，将样本视为向量，通过计算模型梯度找到最易引发误判的方向添加扰动。但此类方法大多适用于图像等连续空间，对可执行文件中的离散结构处理效果有限。
+
+Methods Based on Gradients: Methods such as FGSM\cite{lupart2023study} (Fast Gradient Sign Method) and PGD\cite{bryniarski2021evading} (Projected Gradient Descent) regard samples as vectors and calculates model gradients to find disturbance directions that are most likely to cause misclassification. However, these methods are mostly suitable for continuous spaces like images, and their effectiveness is limited when processing discrete structures in executable files.
 
 
 启发式与搜索方法：这类方法将扰动操作建模为搜索问题，利用遗传算法\cite{wang2022black}、模拟退火\cite{bertsimas1993simulated}、蒙特卡洛树搜索\cite{chaslot2010monte}等手段，在可执行性约束下寻找最佳扰动路径。其优点是可定制性强，但搜索效率与样本质量之间常常存在权衡。
 
+Methods Based on Heuristics and Searches: These methods model disturbance operations as search problems and utilize genetic algorithms\cite{wang2022black}, simulated annealing\cite{bertsimas1993simulated}, Monte Carlo tree search\cite{chaslot2010monte}, and other similar techniques to find optimal disturbance paths with executability constraints. Their advantage is high customizability, but a balance often happens between search efficiency and sample quality.
+
 基于强化学习的方法：近年来，强化学习（RL）因其在策略学习方面的优势，逐渐成为对抗样本生成研究的热点。攻击者构建一个智能体，以规避检测系统为奖励目标，学习一系列扰动策略。常见方法如基于Q-learning\cite{watkins1992q}、DQN\cite{osband2016deep}、PPO\cite{yu2022surprising}（Proximal Policy Optimization）等。这类方法能在保证样本合法性的前提下，实现自适应扰动策略的学习与优化。
+
+Methods Based on Reinforcement Learning: Recently, reinforcement learning has gradually become a hotspot in adversarial sample generation research because of its advantages in policy learning. Attackers build an agent that learns a sequence of disturbance strategies to evade detection systems and uses evasion rate as a reward target. Common methods including Q-learning\cite{watkins1992q}, DQN\cite{osband2016deep}, and PPO \cite{yu2022surprising}(Proximal Policy Optimization) can achieve adaptive disturbance policy learning and optimization while ensuring sample legitimacy.
 
 对抗性恶意软件的研究不仅揭示了现有检测系统的潜在脆弱性，也推动了鲁棒性检测模型和对抗训练机制的快速发展。然而，如何在扰动成本、逃逸能力和语义一致性之间取得平衡，仍是该领域面临的核心挑战之一。尤其是在对抗样本跨模型迁移性、抗演化检测能力方面，仍需深入研究。
 
-\section{强化学习}
+Research on adversarial malware not only reveals that existing detection systems have potential vulnerabilities but also propels rapid development in enhancing detection models’ robustness and developing adversarial training mechanisms. However, achieving balance among disturbance cost, evasion capability, and semantic consistency remains a core challenge in this field. Further investigation is particularly required, especially the transferability of adversarial samples among different models and resistance to evolving detection systems.  
 
-强化学习（Reinforcement Learning, RL）是一种基于试错机制（trial and error）进行学习的人工智能方法，其核心思想是智能体（Agent）通过与环（Environment）的交互，在获得奖励信号的基础上不断调整策略，以最大化长期收益。与监督学习不同，强化学习并不依赖于明确的标签信息，而是通过环境反馈学习行为的价值，具有较强的自适应性与在线学习能力，因而广泛应用于博弈策略优化、机器人控制、自然语言处理及对抗样本生成等任务中。
+\section{强化学习 Reinforcement Learning}
 
-强化学习过程通常可以使用马尔可夫决策过程（Markov Decision Process, MDP）建模，MDP由一个五元组(S, A, P, R, γ)构成，其中表示所有可能的环境状态的集合。每一个状态刻画了当前环境的完整信息，它是Agent进行决策时观察到的依据。表示所有可能的动作或行为的集合。Agent在某一特定状态下可以选择一个动作  来与环境进行交互。 定义了环境的动态变化规律，即在状态下采取动作后转移到下一个状态的概率，通常表示为：这一性质体现了马尔可夫性，即下一个状态只与当前状态和当前动作有关，与过去的历史无关。 是即时奖励函数，表示在状态  下采取动作后，环境给予Agent的即时反馈，记为 。奖励信号用于指导Agent的学习过程，使其调整行为以获取更多的累计奖励。 是一个折扣因子，用于平衡短期奖励与长期奖励的重要性。较小的  倾向于让Agent更关注近期的奖励，而较大的则鼓励Agent考虑长期累积收益。
+强化学习（Reinforcement Learning, RL）是一种基于试错机制（trial and error）进行学习的人工智能方法，其核心思想是智能体（Agent）通过与环境（Environment）的交互，在获得奖励信号的基础上不断调整策略，以最大化长期收益。与监督学习不同，强化学习并不依赖于明确的标签信息，而是通过环境反馈学习行为的价值，具有较强的自适应性与在线学习能力，因而广泛应用于博弈策略优化、机器人控制、自然语言处理及对抗样本生成等任务中。
+
+Reinforcement Learning (RL) is an artificial intelligence learning method based on trial-and-error mechanism. Its core principle is that an agent continuously adjusts its strategy through interactions with the environment to get maximize long-term returns, guided by reward signals. Different from supervised learning, Reinforcement Learning does not rely on definite label information but learns the value of behaviors through environmental feedback. It exhibits strong adaptability and online learning capabilities, which makes it widely applicable to tasks such as game strategy optimization, robotic control, natural language processing, and adversarial sample generation.
+
+强化学习过程通常可以使用马尔可夫决策过程（Markov Decision Process, MDP）建模，MDP由一个五元组(S, A, P, R, $\gamma$)构成，其中$S$表示所有可能的环境状态的集合。每一个状态$s\in S$刻画了当前环境的完整信息，它是Agent进行决策时观察到的依据。$A$表示所有可能的动作或行为的集合。Agent在某一特定状态$s$下可以选择一个动作$a\in A$来与环境进行交互。$P:S\times A\times S \to [0,1]$定义了环境的动态变化规律，即在状态$s$下采取动作$a$后转移到下一个状态$s^{'}$的概率，通常表示为：$P(s^{'}|s,a)=Pr(s_{t+1}=s^{'}|s_{t}=s,a_{t}=a)$这一性质体现了马尔可夫性，即下一个状态只与当前状态和当前动作有关，与过去的历史无关。$R:S\times A \to \mathbf{R}$是即时奖励函数，表示在状态$s$下采取动作$a$后，环境给予Agent的即时反馈，记为$r_{t}$。奖励信号用于指导Agent的学习过程，使其调整行为以获取更多的累计奖励。$\gamma \in (0,1)$是一个折扣因子，用于平衡短期奖励与长期奖励的重要性。较小的$\gamma$倾向于让Agent更关注近期的奖励，而较大的$\gamma$则鼓励Agent考虑长期累积收益。
+
+The reinforcement learning process is commonly modeled using a Markov Decision Process (MDP) that is defined by a quintuple, (S, A, P, R, $\gamma$).
+In this quintuple, $S$ represents the set of all possible environmental states. Each state $s\in S$ describes the complete information about the current environment and serves as the reliance for the agent to make decisions.
+$A$ is the set of all possible actions or behaviors. The agent selects an action $a\in A$ in a specific state $s$ to interact with the environment.
+$P:S\times A\times S \to [0,1]$ defines the dynamic changes of the environment, also the transition probability that is commonly expressed as $P(s^{'}|s,a)=Pr(s_{t+1}=s^{'}|s_{t}=s,a_{t}=a)$ from state $s$ to next state $s^{'}$after taking action $a$. This probability embodies the Markov property, the next state only depends on the current state and current action, and it is unrelated to historical states.
+$R:S\times A \to \mathbf{R}$ is the immediate reward function, which indicates the immediate reward $r_{t}$ given by the environment after the agent takes action $a$ in state $s$. Reward signals are used to guide the agent’s learning process to maximize cumulative rewards.
+$\gamma \in (0,1)$ is a discount factor to balance the importance between immediate and future rewards. A smaller $\gamma$ tends the agent to concentrate on short-term rewards, while a larger $\gamma$ biases the agent toward long-term cumulative returns.
 
 \begin{figure}[hbt]
 	\centering
 	\includegraphics[width=0.75\textwidth]{figures/2.3}
 	% \caption[这里的文字将会显示在 listoffigure 中]{这里的文字将会显示在正文中}
-	\caption{马尔可夫决策过程}\label{fig:2.3}
+	\caption{马尔可夫决策过程 Markov Decision Process}\label{fig:2.3}
 \end{figure}
 
 在实际的强化学习交互过程中，智能体（Agent）遵循以下步骤循环进行：
+
+In practical Reinforcement Learning interactions, the Agent follows as the cyclic process below:
 \begin{enumerate} [label=\arabic*)] 
 	
-\item 观察状态：在时间步 ，Agent观察到当前的环境状态 。
-\item 选择动作：基于当前策略 ，Agent选择一个动作 。
-\item 执行动作并反馈：动作  作用于环境，环境根据转移概率  跳转到下一个状态 ，并反馈一个即时奖励 。
+\item 观察状态：在时间步$t$ ，Agent观察到当前的环境状态$s_{t}$ 。
+
+Observe State: At the time step $t$, the agent observes the current state $s_{t}$.
+\item 选择动作：基于当前策略$\pi(a|s)$ ，Agent选择一个动作$a_{t}$。
+
+Choose Action: Based on the current policy $\pi(a|s)$, the agent selects an action $a_{t}$.
+\item 执行动作并反馈：动作$a_{t}$作用于环境，环境根据转移概率$P$跳转到下一个状态$s_{t+1}$，并反馈一个即时奖励$r_{t}$ 。
+
+Execute Action and Get Feedback: After executing action $a_{t}$, the environment jumps to state $s_{t+1}$ according to the transition probability $P$ and returns an immediate reward $r_{t}$.
 \item 更新策略（学习）：Agent利用所得到的状态、动作、奖励以及新的状态信息更新其内部策略，以期在未来做出更优的决策。
+
+Update Policy (Learning): The agent uses the observed state, action, reward, and new state information to update its internal policy to improve future decisions.
 
 \end{enumerate}
 
-强化学习的目标是学习一个最优策略 ，使得在任意状态下采取的动作能够最大化未来的累计奖励。累计奖励定义为从当前时刻  开始，未来各时刻奖励的折扣和：
+强化学习的目标是学习一个最优策略$\pi^{*}(a|s)$，使得在任意状态下采取的动作能够最大化未来的累计奖励。累计奖励定义为从当前时刻$t$开始，未来各时刻奖励的折扣和：
+
+The target of Reinforcement Learning is to learn an optimal policy $\pi^{*}(a|s)$ that maximizes the expected cumulative reward which is defined as the sum of discounted rewards at each future moment starting from the current moment $t$:
 \begin{equation}
 	\label{eq:reward}
 	\boldsymbol{G}_t = \sum_{k=0}^{\infty} \gamma^k r_{t+k}
 \end{equation}
 
 其中，\( r_{t+k} \) 表示从时刻 \( t \) 开始第 \( k \) 步时获得的奖励；\( \gamma^k \) 表示第 \( k \) 步奖励的折扣因子。
+
+In this formulation,\( r_{t+k} \) is the reward obtained from Step \( k \) starting from time \( t \), and \( \gamma^k \) represents the discount factor of Step \( k \).
 
 在强化学习中，策略（Policy）是指导智能体在不同状态下选择动作的规则。策略可以是确定性的，也可以是随机性的。策略优化是强化学习的核心目标之一，常见的方法包括直接优化策略的梯度方法，如策略梯度（Policy Gradient）算法\cite{silver2014deterministic}，以及近些年提出的PPO\cite{yu2022surprising}（Proximal Policy Optimization）、TRPO\cite{schulman2015trust}（Trust Region Policy Optimization）等更稳定、高效的优化方法。策略优化关注的是如何基于交互经验调整智能体的行为，以更好地达成目标。
 
