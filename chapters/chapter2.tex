@@ -142,7 +142,7 @@ Methods Based on Heuristics and Searches: These methods model disturbance operat
 
 基于强化学习的方法：近年来，强化学习（RL）因其在策略学习方面的优势，逐渐成为对抗样本生成研究的热点。攻击者构建一个智能体，以规避检测系统为奖励目标，学习一系列扰动策略。常见方法如基于Q-learning\cite{watkins1992q}、DQN\cite{osband2016deep}、PPO\cite{yu2022surprising}（Proximal Policy Optimization）等。这类方法能在保证样本合法性的前提下，实现自适应扰动策略的学习与优化。
 
-Methods Based on Reinforcement Learning: Recently, reinforcement learning has gradually become a hotspot in adversarial sample generation research because of its advantages in policy learning. Attackers build an agent that learns a sequence of disturbance strategies to evade detection systems and uses evasion rate as a reward target. Common methods including Q-learning\cite{watkins1992q}, DQN\cite{osband2016deep}, and PPO \cite{yu2022surprising}(Proximal Policy Optimization) can achieve adaptive disturbance policy learning and optimization while ensuring sample legitimacy.
+Methods Based on Reinforcement Learning: Recently, Reinforcement Learning has gradually become a hotspot in adversarial sample generation research because of its advantages in policy learning. Attackers build an agent that learns a sequence of disturbance strategies to evade detection systems and uses evasion rate as a reward target. Common methods including Q-learning\cite{watkins1992q}, DQN\cite{osband2016deep}, and PPO \cite{yu2022surprising}(Proximal Policy Optimization) can achieve adaptive disturbance policy learning and optimization while ensuring sample legitimacy.
 
 对抗性恶意软件的研究不仅揭示了现有检测系统的潜在脆弱性，也推动了鲁棒性检测模型和对抗训练机制的快速发展。然而，如何在扰动成本、逃逸能力和语义一致性之间取得平衡，仍是该领域面临的核心挑战之一。尤其是在对抗样本跨模型迁移性、抗演化检测能力方面，仍需深入研究。
 
@@ -156,7 +156,7 @@ Reinforcement Learning (RL) is an artificial intelligence learning method based 
 
 强化学习过程通常可以使用马尔可夫决策过程（Markov Decision Process, MDP）建模，MDP由一个五元组(S, A, P, R, $\gamma$)构成，其中$S$表示所有可能的环境状态的集合。每一个状态$s\in S$刻画了当前环境的完整信息，它是Agent进行决策时观察到的依据。$A$表示所有可能的动作或行为的集合。Agent在某一特定状态$s$下可以选择一个动作$a\in A$来与环境进行交互。$P:S\times A\times S \to [0,1]$定义了环境的动态变化规律，即在状态$s$下采取动作$a$后转移到下一个状态$s^{'}$的概率，通常表示为：$P(s^{'}|s,a)=Pr(s_{t+1}=s^{'}|s_{t}=s,a_{t}=a)$这一性质体现了马尔可夫性，即下一个状态只与当前状态和当前动作有关，与过去的历史无关。$R:S\times A \to \mathbf{R}$是即时奖励函数，表示在状态$s$下采取动作$a$后，环境给予Agent的即时反馈，记为$r_{t}$。奖励信号用于指导Agent的学习过程，使其调整行为以获取更多的累计奖励。$\gamma \in (0,1)$是一个折扣因子，用于平衡短期奖励与长期奖励的重要性。较小的$\gamma$倾向于让Agent更关注近期的奖励，而较大的$\gamma$则鼓励Agent考虑长期累积收益。
 
-The reinforcement learning process is commonly modeled using a Markov Decision Process (MDP) that is defined by a quintuple, (S, A, P, R, $\gamma$).
+The Reinforcement Learning process is commonly modeled using a Markov Decision Process (MDP) that is defined by a quintuple, (S, A, P, R, $\gamma$).
 In this quintuple, $S$ represents the set of all possible environmental states. Each state $s\in S$ describes the complete information about the current environment and serves as the reliance for the agent to make decisions.
 $A$ is the set of all possible actions or behaviors. The agent selects an action $a\in A$ in a specific state $s$ to interact with the environment.
 $P:S\times A\times S \to [0,1]$ defines the dynamic changes of the environment, also the transition probability that is commonly expressed as $P(s^{'}|s,a)=Pr(s_{t+1}=s^{'}|s_{t}=s,a_{t}=a)$ from state $s$ to next state $s^{'}$after taking action $a$. This probability embodies the Markov property, the next state only depends on the current state and current action, and it is unrelated to historical states.
@@ -204,33 +204,59 @@ In this formulation,\( r_{t+k} \) is the reward obtained from Step \( k \) start
 
 在强化学习中，策略（Policy）是指导智能体在不同状态下选择动作的规则。策略可以是确定性的，也可以是随机性的。策略优化是强化学习的核心目标之一，常见的方法包括直接优化策略的梯度方法，如策略梯度（Policy Gradient）算法\cite{silver2014deterministic}，以及近些年提出的PPO\cite{yu2022surprising}（Proximal Policy Optimization）、TRPO\cite{schulman2015trust}（Trust Region Policy Optimization）等更稳定、高效的优化方法。策略优化关注的是如何基于交互经验调整智能体的行为，以更好地达成目标。
 
-除了直接优化策略之外，强化学习中还广泛使用价值函数（Value Function）来间接指导策略改进。价值函数评估智能体在特定状态或状态-动作对上能够获得的期望累计奖励，通常包括状态价值函数V(s)和动作价值函数Q(s,a)。通过对价值函数的学习，智能体能够更有针对性地选择动作。价值函数的估计可以通过动态规划（如价值迭代、策略迭代）、蒙特卡洛方法\cite{chaslot2010monte}（Monte Carlo Methods）、或时间差分学习\cite{tesauro1991practical}（Temporal Difference Learning）等技术来实现。
+In Reinforcement Learning, the policy defines how the agent chooses actions in different states, and it can be definite or random. Policy optimization, which is the critical goal of Reinforcement Learning, includes traditional methods based on gradient like Policy Gradient algorithm and novel methods that are more stable and efficient like Proximal Policy Optimization (PPO) algorithm and Trust Region Policy Optimization (TRPO) algorithm. Policy optimization concentrates on how to adjust the action based on interaction experience and achieve the goal better.
+
+除了直接优化策略之外，强化学习中还广泛使用价值函数（Value Function）来间接指导策略改进。价值函数评估智能体在特定状态或状态-动作对上能够获得的期望累计奖励，通常包括状态价值函数$V(s)$和动作价值函数$Q(s,a)$。通过对价值函数的学习，智能体能够更有针对性地选择动作。价值函数的估计可以通过动态规划（如价值迭代、策略迭代）、蒙特卡洛方法\cite{chaslot2010monte}（Monte Carlo Methods）、或时间差分学习\cite{tesauro1991practical}（Temporal Difference Learning）等技术来实现。
+
+Except for direct policy optimization, value functions are also used to guide policy improvement indirectly. Value functions that usually contain state value functions $V(s)$ and action value functions $Q(s,a)$ estimate the cumulative expectation reward that the agent gains from specific state or state-action pair. The estimation of value functions can be achieved through dynamic programming such as value iteration and policy iteration, Monte Carlo Methods, or Temporal Difference Learning.
 
 强化学习过程中，智能体面临探索（Exploration）与利用（Exploitation）的权衡问题。探索意味着尝试新的、未验证过的动作，以期发现更优的决策路径；而利用则是依据已有知识选择当前认为最优的动作以获取最大回报。如何在探索和利用之间达到合理平衡，直接影响学习效率和最终性能。常见的探索机制包括ε-贪婪策略\cite{wunder2010classes}（Epsilon-Greedy）、基于置信上界\cite{auer2002finite}（Upper Confidence Bound, UCB）的方法、以及基于策略熵的鼓励机制（Entropy Regularization）。
 
+The agent faces a trade-off problem that it should balance exploration and exploitation during the Reinforcement Learning process. Exploration means that the agent tests novel actions that are not verified to discover higher reward pathways, while exploitation means that the agent chooses the current optimal action to get the biggest reward according to the knowledge that it has learnt. Getting balance between exploration and exploitation directly has an effect on learning efficiency and ultimate performance. Common exploration strategies include Epsilon-Greedy\cite{wunder2010classes}, Upper Confidence Bound (UCB)\cite{auer2002finite} and entropy regularization.
+
 强化学习方法可以根据是否需要建模环境动态而划分为基于模型（Model-Based）和无模型（Model-Free）两大类。基于模型的方法试图学习环境的状态转移规律和奖励机制，从而通过模拟来提高学习效率，如Dyna-Q\cite{peng2018deep}算法。相比之下，无模型的方法则直接根据交互数据学习策略或价值函数，无需显式推断环境模型，代表算法包括深度Q网络（DQN）、策略梯度方法等。基于模型的方法在样本效率上具有潜在优势，但通常面临模型误差带来的累积偏差问题。
+
+Reinforcement Learning methods can be categorized into two major types, Model-based or Model-Free according to whether modeling dynamic environments is required.Model-based Reinforcement Learning methods, such as the Dyna-Q algorithm\cite{peng2018deep}, attempt to learn the state transition regulations and reward mechanisms of the learning environment and then enhance learning efficiency through simulation. Compared to model-based Reinforcement Learning methods, Model-free Reinforcement Learning methods learn policies or value functions directly from interaction data without inferring environmental models explicitly. Representative algorithms include the Deep Q-Networks (DQN) algorithm, the Policy Gradient algorithm etc. Model-based Reinforcement Learning methods have latent advantages in sample efficiency. However, they usually face cumulative deviation brought by model deviation.
 
 近年来，深度强化学习\cite{li2019deep}（Deep Reinforcement Learning, DRL）技术的兴起，使得强化学习能够处理高维、复杂的输入空间。通过引入深度神经网络作为策略函数或价值函数的近似器，DRL极大地拓展了强化学习的应用边界。例如，DQN使用卷积神经网络处理原始像素输入，成功在Atari游戏中达到人类水平；而DDPG、A3C、PPO等方法则将深度学习与连续控制任务结合，在机器人控制、自动驾驶等领域表现出色。深度强化学习的挑战主要在于训练不稳定性和样本效率问题，因此在研究中引入了经验回放、目标网络、归一化技术等一系列改进措施。
 
+Recently, with the popularity of DRL (Deep Reinforcement Learning)\cite{li2019deep} technology, Reinforcement Learning models can tackle complex multi-dimensional input spaces. Through introducing the deep neural networks, Deep Reinforcement Learning (DRL) extends Reinforcement Learning application boundaries. For example, DQN utilizes convolutional neural networks to process original input pixels, successfully reaching the human level in Atari games. Besides, methods such as DDPG, A3C and PPO integrate deep learning with continuous control tasks and have good performance in realms such as robotic control and autonomous driving. However, DRL faces challenges like instability and low sample efficiency, thus experience replaying, targeting networks, and normalizing technologies are introduced to the experiment.
+
 此外，面对复杂任务和长时间尺度的决策需求，强化学习也发展出层次化学习（Hierarchical Reinforcement Learning, HRL）\cite{nachum2018data}的方法。通过引入子任务（Options）或多层次的策略结构，HRL能够在抽象层次上分解决策问题，提升学习效率和泛化能力。层次强化学习方法如FeUdal Networks、Options Framework在多阶段任务规划中展现了明显优势。
+
+Furthermore, to solve the requirements for complex tasks and long-term strategies, Hierarchical Reinforcement Learning (HRL) methods are used in Reinforcement Learning\cite{nachum2018data}. By introducing sub-tasks or multiple hierarchical strategy structures, Hierarchical Reinforcement Learning dismantles problems on abstract layers, improving learning efficiency and generalization abilities. Hierarchical Reinforcement Learning methods like FeUdal Networks and Options Framework have advantages in multi-stage task formulation.
 
 在多智能体环境中，强化学习技术进一步拓展到多智能体强化学习（Multi-Agent Reinforcement Learning, MARL）领域。MARL研究多个智能体在同一环境中相互作用、竞争或协作的学习过程。针对多智能体系统中策略非平稳性的问题，提出了集中式训练与分布式执行（CTDE）框架、对抗性自博弈（Self-Play）等方法，广泛应用于博弈决策、群体智能、对抗训练等方向。
 
+In multi-agent systems, Reinforcement Learning technology expands to Multi-Agent Reinforcement Learning (MARL) realm. MARL researches the learning process where multiple agents interact, compete, or cooperate in the same environment. To address the unstable strategy problem, centralized training, CTDE framework, and Self-Play methods are issued, which are applied in game decision-making, swarm intelligence, adversarial training and other fields.
+
 总体来看，强化学习技术体系涵盖了从基础建模到复杂策略优化、从单智能体学习到多智能体协作的广泛内容。随着计算能力提升和算法不断创新，强化学习正在成为解决复杂智能决策问题不可或缺的重要技术。
 
-\section{神经网络与时序建模技术}
+Collectively, the Reinforcement Learning technology system covers foundational modeling to sophisticated strategy optimization, from single-agent to multi-agent cooperation contexts. With advancing computational power and algorithmic innovation, Reinforcement Learning plays a crucial role in solving intricate decision-making challenges.
+
+\section{神经网络与时序建模技术 Neural Networks and Sequential Modeling Techniques}
 
 神经网络（Neural Networks）是一类模拟人脑神经元结构与运行机制的计算模型，广泛应用于图像识别、自然语言处理、智能决策等领域。其基本结构包括输入层、一个或多个隐藏层和输出层。每一层通过权重连接前一层神经元，并使用激活函数引入非线性能力，使网络能够逼近任意复杂的非线性映射关系。
 
+Neural Networks (NNs) are computational models simulating the structure and executing functionality of the human brain, widely applied in image recognition, natural language processing, and intelligent decision-making. Their basic architecture includes an input layer, one or more hidden layers, and an output layer. Each layer connects to the previous layer's neurons through weights and introduces nonlinear capabilities by using activation functions, enabling the network to approximate complex nonlinear mapping relations.
+
 神经网络的核心优势在于其强大的表示能力，尤其在数据量充足的情况下，能够自动学习数据中的高阶抽象特征，替代传统人工设计特征的方式，大幅提升模型的泛化性能与适应能力。
+
+The core advantage of neural networks is their strong representation power, especially when they are given sufficient data, they can automatically learn high-level abstract features from input data. By replacing traditional manual feature engineering, neural networks significantly enhance their model generalization performance and adaptability.
 
 在安全领域，神经网络已被用于恶意软件检测、异常行为识别、攻击流量检测等任务，并取得显著成果。然而，由于很多安全任务具有时间依赖性强、上下文联系紧密、行为逻辑复杂等特点，传统的前馈神经网络往往无法有效捕捉这些动态特征。
 
-\subsection{循环神经网络（RNN）}
+In the cybersecurity domain, neural networks have been employed for tasks such as malware detection, anomaly behavior recognition, and attack traffic detection, achieving notable results. However, many security tasks have dynamic features such as high temporal dependency, tight contextual linkage, and complex behavioral logic, which cause traditional feedforward neural networks to be struggle to capture these dynamic features effectively.
+
+\subsection{循环神经网络（RNN） Recurrent Neural Network(RNN)}
 
 循环神经网络（Recurrent Neural Network，RNN）是一种专门用于处理序列数据的神经网络模型，其核心特点是具有“记忆能力”，即在处理当前输入时能够利用以往时间步的信息。与传统前馈神经网络不同，RNN的隐藏层神经元不仅接收当前时刻的输入，还接收上一个时刻隐藏层的输出，从而实现了对时间序列的依赖建模。这种结构使RNN特别适合处理语言文本、语音、视频帧序列等具有时间顺序的数据。
 
+Recurrent Neural Networks (RNNs) are specialized neural network models for processing sequential data. Their key feature is their memory capability, enabling them to use the information from previous time steps when processing current inputs. Unlike traditional feedforward networks, RNN hidden layers receive not only current inputs but also previous hidden layers’ outputs, achieving modeling temporal dependencies. This structure makes RNNs particularly suitable for processing sequential data like text, voices, and video frame sequences.
+
 在RNN中，每一个时间步的计算会将上一个时间步的状态（隐藏层的输出）传递到下一个时间步，并结合当前输入进行处理，实现序列中信息的传递和积累。但在实际训练过程中，由于反向传播时梯度要经过多个时间步回传，RNN容易出现“梯度消失”或“梯度爆炸”的问题，导致模型在长序列中难以捕捉长期依赖关系。
+
+In RNN, each step's computation passes the previous step's state (hidden layer output) to the next step, combining it with current inputs to propagate and accumulate information in sequence. However, during the real training process, RNNs often suffer from gradient vanishing or gradient explosion because gradients require multiple time steps to achieve propagating back during the backpropagation, which makes the model difficult to capture long-term dependencies.
 
 \begin{figure}[hbt]
 	\centering
@@ -239,28 +265,41 @@ In this formulation,\( r_{t+k} \) is the reward obtained from Step \( k \) start
 	\caption{RNN神经网络结构}\label{fig:2.4}
 \end{figure}
 
-为了解决这一问题，研究者提出了多种改进结构，其中最具代表性的是长短期记
-忆网络（Long Short-Term Memory, LSTM）和门控循环单元（Gated Recurrent Unit, GRU）。这些改进模型通过引入门控机制（如输入门、遗忘门、输出门）来控制信息
+为了解决这一问题，研究者提出了多种改进结构，其中最具代表性的是长短期记忆网络（Long Short-Term Memory, LSTM）和门控循环单元（Gated Recurrent Unit, GRU）。这些改进模型通过引入门控机制（如输入门、遗忘门、输出门）来控制信息
 的流入、保留和输出，有效缓解了传统 RNN 在长序列建模中的不足。
 
-RNN及其变种在诸多序列建模任务中展现出强大的性能，特别是在自然语言处
-理、机器翻译、语音识别、恶意行为序列建模等领域中，为强化学习、时序建模和序
-列生成等应用提供了坚实的基础。
+To address this issue, researchers introduced many types of improved structures like Long Short-Term Memory (LSTM) and Gated Recurrent Units (GRU), incorporating gating mechanisms, such as Input Gate, Forget Gate, and Output Gate, to control the information flowing, retaining, output, relieving RNN limitations in long-sequence modeling.
 
-\subsection{长短期记忆网络（LSTM）}
+RNN及其变种在诸多序列建模任务中展现出强大的性能，特别是在自然语言处理、机器翻译、语音识别、恶意行为序列建模等领域中，为强化学习、时序建模和序列生成等应用提供了坚实的基础。
+
+RNNs and their variants demonstrate high performance in various sequential modeling tasks, especially in natural language processing, machine translation, speech recognition, and malicious behavior sequence modeling, which provides a solid foundation for applications like reinforcement learning, temporal modeling, and sequence generation.
+
+\subsection{长短期记忆网络（LSTM） Long Short-Term Memory(LSTM)}
 
 长短期记忆网络（Long Short-Term Memory，LSTM）\cite{graves2012long}是一种特殊的循环神经网络（RNN）结构，旨在解决传统RNN在处理长序列数据时面临的“梯度消失”和“梯度爆炸”问题。与传统RNN相比，LSTM通过引入精心设计的“门控机制”，能够在序列中选择性地记住或忘记信息，从而有效捕捉长期依赖关系，广泛应用于自然语言处理、语音识别、时间序列预测等任务。
 
+The Long Short-Term Memory (LSTM) \cite{graves2012long} is a special RNN designed to overcome the issue that traditional RNNs suffer from gradient vanishing and gradient explosion when processing long sequences. Unlike common RNNs, LSTM adapts carefully designed "gating mechanisms" to selectively remember or forget information from sequences, thus effectively capturing long-term dependencies. LSTM is widely used in natural language processing, voice recognition, and time-series prediction.
+
 LSTM的核心结构包含三个门控单元：输入门（Input Gate）、遗忘门（Forget Gate）和输出门（Output Gate），以及一个单元状态（Cell State），用于携带长期记忆信息。
+
+The LSTM core structure contains three gating units: Input Gate, Forget Gate, and Output Gate, along with a Cell State that is used to carry long-term memory information.
 
 输入门：控制当前输入信息中哪些部分可以被写入到记忆单元中；
 
+Input Gate controls which parts of current input are written into the memory cell.
+
 遗忘门：决定前一时刻的记忆状态中哪些信息应该被保留、哪些应该被遗忘；
+
+Forget Gate determines which information from the previous memory state should be retained or forgotten.
 
 输出门：则决定当前时刻的记忆状态中哪些内容将作为隐藏状态传递到下一时刻。
 
+Output Gate decides which parts of the current memory state are passed to the next time step as the hidden state.
+
 LSTM的关键是通过这三个门的配合，实现对信息流的精确控制，从而保留对模型预测有用的信息，丢弃无用或冗余的信息。其信息流如下：首先，遗忘门根据当前输入和前一时刻的隐藏状态，决定哪些旧信息要被“遗忘”；接着，输入门决定要将多少当前输入的新信息写入记忆单元；然后，更新记忆状态；最后，输出门根据当前记忆状态输出一个隐藏状态，用于传递到下一个时间步。
 LSTM的这种设计使得它可以在长序列中持续保留有效信息，并忽略无关部分，克服了传统RNN在长距离依赖建模方面的劣势。
+
+The key to LSTM is that the cooperation of these three gates enables LSTM to control the information flow precisely, retaining useful information for model predictions while discarding irrelevant or redundant data. Its information flow is described as follows: First, the forget gate decides which old information should be discarded based on current input and previous hidden state; Second, the input gate determines how much new input should be written into the memory cell; Third, the memory state updates; Finally, the output gate generates a hidden state from current memory state for passing to the next time step.
 
 \begin{figure}[hbt]
 	\centering
@@ -271,34 +310,52 @@ LSTM的这种设计使得它可以在长序列中持续保留有效信息，并�
 
 由于恶意软件的行为特征和扰动操作本质上具有明显的时序依赖性和上下文联系。恶意样本在执行过程中会形成一系列调用序列、系统行为或指令流，这些序列中的上下文信息对判断恶意行为及实施有效扰动具有重要价值。传统的全连接神经网络或标准循环神经网络（RNN）在处理这类时序数据时，往往难以保持长期依赖，容易遗忘序列中早期的关键信息。而 LSTM 网络通过引入门控机制（包括输入门、遗忘门和输出门），能够有效控制信息的记忆与遗忘，从而保留长期依赖关系，提升模型对扰动序列语义结构的建模能力。具体而言，在生成扰动策略时，LSTM 能够根据当前样本结构状态和历史扰动操作，动态调整策略输出，从而生成更具“攻击性”同时又具备高隐蔽性的对抗扰动。这种记忆能力对于生成具有“顺序逻辑”且能逃避检测系统的恶意行为非常关键。
 
+Due to malware's behavioral features and disturbance operations having obvious sequential reliance and contextual relation, malware samples generate sequences of API calls, system behaviors, or instruction flows during execution, where contextual information is crucial for identifying malicious actions and implementing effective disturbances. Maintaining long-term dependencies is nearly impossible for traditional fully connected NNs or standard RNNs when processing this sequential data, with frequently forgetting early information in sequences. In contrast, LSTM's gating mechanisms enable gate-controlled mechanisms including Input Gate, Forget Gate, and Output Gate, which can effectively control information retention and forgetting, preserve long-term dependencies and enhance the model's ability to capture disturbance sequence semantics. Generally, while generating disturbance strategies, LSTM can dynamically adjust strategy outputs based on the current sample state and historical disturbance operations, producing samples that are not only more "aggressive" but also modified by highly concealed adversarial disturbances. This memory capability is essential for generating malicious behaviors that exhibit "sequential logic" and can evade detection systems.
+
 \section{PPO}
 
 Proximal Policy Optimization（PPO）\cite{yu2022surprising}是一种基于策略梯度的强化学习算法，由 OpenAI 于 2017 年提出。作为 Trust Region Policy Optimization（TRPO）的改进版本，PPO 保留了 TRPO 中稳定更新策略的核心思想，同时大幅简化了算法的实现和训练流程。由于其良好的稳定性与效率，PPO 已成为深度强化学习领域中应用最广泛、表现最为稳定的算法之一。
 
+Proximal Policy Optimization (PPO) is a reinforcement learning algorithm based on policy gradients\cite{yu2022surprising}, introduced by OpenAI in 2017. As an improved version of Trust Region Policy Optimization (TRPO), PPO remains the core stable policy updates concept of TRPO while significantly simplifying the algorithm's implementation and training process. Because of its robustness and efficiency, PPO has become one of the most widely used and consistently stable algorithms in deep reinforcement learning.
+
 PPO 的核心思想在于限制新旧策略之间的变化幅度，从而避免策略在更新过程中发生剧烈波动，保证学习过程的稳定性。与传统策略梯度方法直接最大化目标不同，PPO 引入了裁剪目标函数（clipped objective）或基于 KL 散度的惩罚项，用以约束新旧策略的差异。
 
+The core target of PPO is to limit the magnitude of changes between old and new policies, thus preventing drastic fluctuations during policy updates and ensuring learning process stability. Different from traditional policy gradient methods that directly maximize objectives, PPO introduces a clipped objective function or a penalty term modification based on KL divergence to constrain differences between old and new policies.
+
 在裁剪目标函数形式下，PPO 的优化目标为：
+
+In the clipped objective function form, PPO's optimization objective is described as below.
 \begin{equation}
 	\boldsymbol{r}_t(\theta) = \frac{\boldsymbol{\pi}_\theta(\boldsymbol{a}_t | \boldsymbol{s}_t)}{\boldsymbol{\pi}_{\theta_{\text{old}}}(\boldsymbol{a}_t | \boldsymbol{s}_t)}
 \end{equation}
 
 其中，\( \boldsymbol{r}_t(\theta) \) 表示当前策略与旧策略在动作概率上的比值。通过最小化裁剪后的目标函数，可以有效防止策略更新偏离旧策略过远，从而提升训练过程的稳定性。
 
+In this equation, \( \boldsymbol{r}_t(\theta) \) is the action probability ratio between the current policy and the old policy. By minimizing this clipped objective function, PPO effectively prevents policy updates from deviating too far from the old policy, enhancing the stability during training process.
+
 PPO具有诸多显著优势。其稳定性强，通过引入“剪切”目标函数限制每一步策略更新的幅度，从而有效避免了策略在训练过程中发生剧烈变化或崩溃的问题，提升了训练的可靠性。其次，PPO易于实现，相较于 TRPO（Trust Region Policy Optimization）等算法，不需要进行二阶导数计算或求解复杂的约束优化问题，因此更易于在工程中部署和调试，拥有更好的实用性。此外，PPO 还展现出良好的泛化能力，适用于多种不同类型的任务和环境，尤其在处理高维状态空间、复杂交互场景（如机器人控制、游戏智能体）中表现出色。其结构简单但高效，适配性强，可与卷积神经网络、循环神经网络等多种深度结构结合，有助于应对不同形式的输入数据（如图像、序列等）。
+
+PPO has significant advantages in many realms. By introducing a clipped objective function to restrain each strategy's update step, its strong stability increases training reliability and avoids the problem that strategies suffer from abrupt changes or crashes during training. Besides, PPO is easy to implement. Compared to algorithms like Trust Region Policy Optimization (TRPO), PPO requires no second-derivative calculations or complex constrained optimization solutions, which makes it more practical to deploy and debug in engineering projects. Additionally, PPO exhibits strong generalization capabilities that make it suitable for diverse tasks and environments, particularly excelling in high-dimensional state spaces and complex interaction scenarios such as robotic control and game agents. PPO's structure is simple but efficient and highly adaptive, which makes it be able to combine with other deep structures like CNNs and RNNs, which is helpful to tackle various types of input data like images and sequences.
 
 在本文所研究的对抗性恶意软件样本生成任务中，PPO 展现出独特的应用优势。由于扰动策略优化本质上是一个非线性且动态变化的过程，同时需要在保持样本功能完整性的前提下逐步施加扰动，PPO 通过平稳且高效的策略更新机制，为智能体提供了持续优化扰动策略的能力，避免了因剧烈策略变动而导致样本失效的问题。
 
+In the adversarial malware sample generation task researched in this paper, PPO demonstrates unique applicability. Since disturbance strategy optimization is a nonlinear and dynamic process requiring gradually modifying while preserving sample functionality, PPO provides a stable and efficient strategy update mechanism for agents to continuously optimize disturbance strategies, solving the issue that samples lose their functions due to abrupt strategy changes.
+
 因此，PPO 成为本文对抗性恶意软件扰动策略学习的核心算法之一。其稳定的策略优化特性与优异的泛化性能，为生成高效、隐蔽且具有迁移能力的对抗样本提供了坚实的技术保障。
+
+Therefore, PPO is the core algorithm for adversarial malware disturbance strategy learning in this work. Its stable policy optimization features and superior generalization provide a solid technical foundation for generating adversarial samples that are efficient, have high concealment and transferability.
 
 \begin{figure}[hbt]
 	\centering
 	\includegraphics[width=0.75\textwidth]{figures/2.6}
 	% \caption[这里的文字将会显示在 listoffigure 中]{这里的文字将会显示在正文中}
-	\caption{PPO强化学习模型结构}\label{fig:2.6}
+	\caption{PPO强化学习模型结构 PPO Refinforcement Learning Model's Structure}\label{fig:2.6}
 \end{figure}
 
-\section{本章小结}
+\section{本章小结 Chapter Summary}
 
 本章围绕ELF文件结构、恶意软件检测技术、对抗性恶意软件及强化学习四个方面展开了详细介绍。首先，从结构层面对ELF文件的基本组成进行了分析，重点阐述了ELF头、程序头表、节区及节头表在程序执行与加载过程中的作用。接着，介绍了当前主流的恶意软件检测技术，包括静态分析、动态行为分析以及基于机器学习和深度学习的方法，明确了各类方法的优劣和适用场景。在此基础上，进一步探讨了对抗性恶意软件的基本概念、生成方式及其对现有检测系统带来的挑战，指出对抗性样本具有极高的隐蔽性与攻击性，是当前研究中的热点难点问题。最后，本章简要回顾了强化学习的基本原理与流程，并结合恶意软件扰动任务，分析了其在对抗样本生成中的应用潜力。
+
+This chapter has a detailed recommendation for four key areas: ELF file structure, malware detection technologies, adversarial malware, and Reinforcement Learning. First, the basic components of ELF files were analyzed from a structural perspective, emphasizing the functions of the ELF header, program header table, sections, and section header table during program execution and loading. Second, current malware detection technologies were introduced, including static analysis, dynamic behavioral analysis, and methods based on machine learning and deep learning, illustrating the strengths, weaknesses, and applicable scenarios of each method. On this basis, the fundamental concepts, generation methods and challenges brought to existing malware detection systems of adversarial malware were recommended. It was pointed out that adversarial samples exhibit high concealment and aggressiveness, representing a crucial and challenging research topic. Finally, the chapter reviewed basic principles and processes of Reinforcement Learning and analyzed its application potential in generating adversarial samples by combining the features of malware disturbance tasks.  
 
 

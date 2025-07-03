@@ -1,19 +1,19 @@
-\contentsline {figure}{\numberline {1.1}{\ignorespaces 对抗样本生成基本框架}}{3}{figure.caption.8}%
-\contentsline {figure}{\numberline {2.1}{\ignorespaces ELF文件结构}}{8}{figure.caption.9}%
-\contentsline {figure}{\numberline {2.2}{\ignorespaces 恶意软件检测方法分类}}{9}{figure.caption.10}%
-\contentsline {figure}{\numberline {2.3}{\ignorespaces 马尔可夫决策过程}}{13}{figure.caption.11}%
-\contentsline {figure}{\numberline {2.4}{\ignorespaces RNN神经网络结构}}{16}{figure.caption.12}%
-\contentsline {figure}{\numberline {2.5}{\ignorespaces LSTM基本数据单元结构}}{17}{figure.caption.13}%
-\contentsline {figure}{\numberline {2.6}{\ignorespaces PPO强化学习模型结构}}{19}{figure.caption.14}%
-\contentsline {figure}{\numberline {3.1}{\ignorespaces 常见对抗性恶意软件生成模型结构}}{20}{figure.caption.15}%
-\contentsline {figure}{\numberline {3.2}{\ignorespaces 基于强化学习的对抗性样本生成方法框架}}{27}{figure.caption.16}%
-\contentsline {figure}{\numberline {4.1}{\ignorespaces IDA 反汇编 CFG 图}}{35}{figure.caption.22}%
-\contentsline {figure}{\numberline {4.2}{\ignorespaces 指令替换示例图}}{37}{figure.caption.23}%
-\contentsline {figure}{\numberline {4.3}{\ignorespaces 指令重构排序示例图}}{38}{figure.caption.24}%
-\contentsline {figure}{\numberline {4.4}{\ignorespaces 重构的指令有序无环图}}{39}{figure.caption.25}%
-\contentsline {figure}{\numberline {4.5}{\ignorespaces 寄存器保护代码重排序示例图}}{39}{figure.caption.26}%
-\contentsline {figure}{\numberline {4.6}{\ignorespaces 寄存器重分配示例图}}{40}{figure.caption.27}%
-\contentsline {figure}{\numberline {5.1}{\ignorespaces 不同强化学习模型性能训练对比图}}{58}{figure.caption.52}%
-\contentsline {figure}{\numberline {5.2}{\ignorespaces 免杀前后哈勃检测结果对比}}{60}{figure.caption.55}%
-\contentsline {figure}{\numberline {5.3}{\ignorespaces 经对抗性学习后VirusTotal扫描结果}}{65}{figure.caption.58}%
+\contentsline {figure}{\numberline {1.1}{\ignorespaces 对抗样本生成基本框架}}{5}{figure.caption.8}%
+\contentsline {figure}{\numberline {2.1}{\ignorespaces ELF文件结构 ELF File Structure}}{17}{figure.caption.9}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces 恶意软件检测方法分类 Malware Detection Methods Classification}}{19}{figure.caption.10}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces 马尔可夫决策过程 Markov Decision Process}}{27}{figure.caption.11}%
+\contentsline {figure}{\numberline {2.4}{\ignorespaces RNN神经网络结构}}{34}{figure.caption.12}%
+\contentsline {figure}{\numberline {2.5}{\ignorespaces LSTM基本数据单元结构}}{36}{figure.caption.13}%
+\contentsline {figure}{\numberline {2.6}{\ignorespaces PPO强化学习模型结构 PPO Refinforcement Learning Model's Structure}}{39}{figure.caption.14}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces 常见对抗性恶意软件生成模型结构}}{41}{figure.caption.15}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces 基于强化学习的对抗性样本生成方法框架}}{48}{figure.caption.16}%
+\contentsline {figure}{\numberline {4.1}{\ignorespaces IDA 反汇编 CFG 图}}{56}{figure.caption.22}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces 指令替换示例图}}{58}{figure.caption.23}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces 指令重构排序示例图}}{59}{figure.caption.24}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces 重构的指令有序无环图}}{60}{figure.caption.25}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces 寄存器保护代码重排序示例图}}{60}{figure.caption.26}%
+\contentsline {figure}{\numberline {4.6}{\ignorespaces 寄存器重分配示例图}}{61}{figure.caption.27}%
+\contentsline {figure}{\numberline {5.1}{\ignorespaces 不同强化学习模型性能训练对比图}}{79}{figure.caption.52}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces 免杀前后哈勃检测结果对比}}{81}{figure.caption.55}%
+\contentsline {figure}{\numberline {5.3}{\ignorespaces 经对抗性学习后VirusTotal扫描结果}}{86}{figure.caption.58}%
 \contentsfinish 
