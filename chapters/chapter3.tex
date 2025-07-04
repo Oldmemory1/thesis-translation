@@ -1,8 +1,12 @@
-\chapter{基于强化学习的对抗性恶意软件生成技术架构}
-\section{研究的问题描述}
+\chapter{基于强化学习的对抗性恶意软件生成技术架构 Adversarial Malware Generation Framework Based on Reinforcement Learning}
+\section{研究的问题描述 Problem Researched Description}
 近年来，随着深度学习在恶意软件检测领域的广泛应用，其高准确率与自动化能力极大提升了防御系统的智能化水平。然而，研究者相继发现深度神经网络存在严重的对抗性脆弱性——即对输入数据中微小扰动高度敏感，这些扰动在肉眼难以察觉的情况下，足以使模型输出完全错误的判断结果。这一特性被攻击者利用，催生出一种新型威胁形式：对抗性恶意软件。
 
+In recent years, with deep learning widely adopted in malware detection, its high accuracy and automation capabilities have significantly enhanced defense systems’ intelligence. However, researchers have found that deep neural networks exhibit severe adversarial vulnerability, being extremely sensible to subtle disturbances in input data. Imperceptible to humans, these disturbances can cause models to produce entirely incorrect judgments. Attackers utilize this characteristic, catalyzing a novel threat: adversarial malware.
+
 现有的对抗样本生成方法大多数集中于图像或文本等较为简单的数据类型。然而，在恶意软件领域，尤其是ELF文件等二进制可执行文件，扰动的设计和生成面临更多挑战。恶意软件的结构复杂且精密，任何不当的修改都可能导致文件失效或程序崩溃，因此，如何有效地生成既能绕过检测系统又能够保留恶意功能的对抗样本，是目前面临的核心问题。目前的对抗样本生成技术主要集中在静态和动态扰动上，但依然存在几个关键不足：
+
+Current adversarial sample generation methods mostly focus on simpler data types like images or text. However, in malware realms, particularly for binary executables like ELF files, disturbance design faces greater challenges. Malware structures are so complex and precise that improper modifications may cause file failure or program crashes. Thus, how to generate adversarial samples that evade detection while ensuring malicious functionalities remains a crucial challenge. Current techniques mainly concentrate on static and dynamic disturbances but still exist critical shortcomings.
 
 \begin{figure}[hbt]
 	\centering
@@ -13,43 +17,68 @@
 
 \begin{enumerate} [label=\arabic*)] 
 
-\item 扰动空间的局限性与复杂性
+\item 扰动空间的局限性与复杂性 Limitations and Complexion in Disturbance Space
 
 目前，针对对抗性恶意软件样本的生成，已有方法大多采用如字节插入、修改节区名称、篡改元数据等简单扰动手段来逃避检测系统，这类方法虽然操作便利、实现成本低，但往往缺乏结构感知与语义控制能力，其扰动维度较为单一，不能有效覆盖恶意软件在执行过程中所展现出的复杂特征。在面对复杂结构的二进制文件格式（如ELF）时，盲目扰动极易破坏文件原有逻辑或运行路径，导致样本功能失效或出现运行异常。此外，由于这类扰动方式通常在文件表层留下明显的痕迹，所生成的对抗样本容易被现代静态分析工具或启发式检测系统识别，且对抗效果往往不具备。稳定性和泛化能力。尤其在动态行为检测不断增强的背景下，如何在确保恶意功能完整的同时进行细粒度、多维度、良性扰动，成为当前对抗性样本生成研究中亟待突破的关键问题。
 
+Existing methods for adversarial malware generation often rely on simplistic disturbances such as byte insertion, section name modification and metadata tampering, to evade detection. Although these methods are convenient to operate and are low cost, they lack structural awareness and semantic control capability. Besides, their disturbance dimensions are insufficient, which makes them hardly cover complex malware features efficiently during execution. For binary files that have intricate structure like ELF, disturbing blindly can easily disrupt file logic or execution paths, causing functional failure or abnormal behavior. Furthermore, such disturbance methods often leave obvious traces on file surfaces, making adversarial samples easily detected by modern static analysis or heuristic systems, which means the adversarial effectiveness lacks stability and generalizability. Especially in the background that dynamic behavioral detection is enhancing continuously, how to perform fine-grained, multi-dimensional and benign disturbances while ensuring functional integrity is a critical challenge to the research.
 
-\item 扰动的合法性问题
+\item 扰动的合法性问题 Disturbance Legitimacy Problems
 
 尽管当前部分对抗样本生成方法在规避恶意软件检测模型方面取得了一定成效，但其扰动策略普遍存在粗糙和随机性强的问题，常见手段包括随机字节插入、伪装节名称、修改冗余字段等浅层扰动。这类方法虽能在某些静态检测模型中绕过特征匹配机制，但缺乏对扰动合法性与语义一致性的有效控制，难以适应真实环境下多样化且复杂的检测机制。例如，随意插入的字节可能被高级检测模型识别为异常行为（如零号攻击），反而增强了恶意特征的可识别性。尤其对于依赖行为分析或异常检测的模型而言，盲目的扰动不仅无助于逃避检测，反而可能使模型学习到更具代表性的恶意特征，从而降低对抗攻击的有效性。此类“为扰动而扰动”的生成策略虽然可能在静态条件下取得短期成功，但难以保障在实际部署环境中的稳定性与隐蔽性。因此，如何构建更加结构化、具备语义感知能力的扰动策略，在不破坏原有功能的前提下提升扰动的针对性与有效性，成为当前对抗性恶意样本生成研究中的关键挑战之一。
 
-\item 对历史扰动的依赖性缺失
+Although current adversarial generation methods succeed in evading malware detection models, their disturbance strategies tend to be crude and highly random. Common operations include surface-level disturbances such as random byte insertion, disguised section names, and redundant byte modification. While features evade matching in static detectors, they lack effective control over disturbances legitimacy and semantic consistency, struggling against diverse real environments and detection mechanisms. For example, bytes inserted randomly may be recognized as abnormal behaviors such as zero-day attacks by advanced models, enhancing malicious feature detectability. Particularly for detection models based on behavior analysis or abnormal behavior detection, blind disturbances not only fail to evade detection but also risk teaching models more representative malicious features, reducing attack efficiency. Such strategies whose activities are only to disturb without considering effectiveness may achieve short-term static evasion but lack stability and concealment in a real deployment environment. Therefore, developing strategies that are more structural, high awareness to semantic to enhance precision and validity without losing origin functionalities is crucial.
+
+\item 对历史扰动的依赖性缺失 Lacking Historical Disturbance Dependencies
 
 对抗样本的生成过程本质上是一个动态决策序列，其扰动操作并非孤立发生，而是具有明显的时序依赖性——当前的扰动决策往往会受到先前扰动历史的影响。然而，现有的主流对抗样本生成方法大多将每一步扰动视为独立事件，缺乏对扰动序列内在依赖关系的建模与挖掘。这种近似于“无记忆”的策略忽略了扰动间的逻辑联系与语义上下文，导致生成的扰动序列在结构上缺乏连贯性，扰动操作之间相互脱节，甚至可能出现前后矛盾或重复无效的修改操作。这不仅降低了对抗样本的逃避能力和隐蔽性，还可能引入可疑的行为模式，反而提升被检测的风险。特别是在处理结构复杂、语义敏感的二进制恶意样本时，忽视扰动间依赖会进一步削弱攻击效果。因此，如何引入有效的时序建模机制，捕捉扰动操作之间的动态关联，从而生成更具整体性、策略性和欺骗性的扰动序列，是提升对抗样本实战能力的关键突破方向之一。
 
-\item 过于关注逃逸率，忽视扰动成本与执行开销
+Adversarial sample generation is a dynamic decision-making sequence. Disturbance operations manifest sequential dependencies: current decisions depend on prior perturbation history, instead of isolation. However, prevalent methods treat each disturbance step as isolated, neglecting to find the inherent dependency relations. This approximately memoryless strategy ignores logical and semantic contexts between disturbances, resulting in generated sequences structural succession deficiency and disturbance operations disconnected from each other, which exhibits that some modification operations contradict with previous operations or duplicated. This result not only undermines adversarial samples’ evasion capabilities and concealment, but also potentially introduces suspicious action patterns that increase the detected rate. Especially in structurally complex, semantically sensitive malware binaries, overlooking the dependence between disturbances further reduces attack effectiveness. Therefore, introducing effective temporal modeling mechanisms to capture dynamic correlations in disturbance operations and generating more integral, strategic, deceptive disturbance sequences is a key breakthrough in enhancing adversarial sample capacities in real environments.
+
+\item 过于关注逃逸率，忽视扰动成本与执行开销 Overemphasis on Evasion Rate and Negligence on the Cost of Execution
 
 当前许多对抗性恶意软件生成方法普遍将“是否成功逃逸检测系统”作为主要评价指标，过度聚焦于误分类结果，而忽略了扰动过程中的多方面代价。在实际应用中，生成的对抗样本不仅需要具备较强的逃逸能力，还应兼顾扰动的实施成本与执行效率。例如，频繁或复杂的扰动操作可能导致样本体积显著增加、运行时间延长，甚至影响程序的原有功能和行为一致性，从而在实际环境中暴露风险。此外，部分策略在扰动选择上未考虑操作本身的资源消耗和可行性，导致生成的样本难以在有限计算资源下快速部署。忽视这些现实因素，往往使得对抗样本虽然能在检测模型层面绕过检查，但却在工程实际中难以落地。因此，仅以逃逸率为单一优化目标的生成策略存在明显局限，亟需引入对扰动成本与时间开销的系统性考量，以提升对抗样本的实用性与隐蔽性。
+
+Many current adversarial malware methods mostly regard "successfully evading malware detection systems" as the primary evaluation metric, overemphasizing misclassification results while ignoring multifaceted costs of disturbance processes. However, in practical applications, not only high evasion capacities are required to adversarial samples generated, but also keeping the balance of implementation costs and execution efficiency. For example, excessive or complex disturbances significantly increase file size, prolong runtime, disrupt functionality, or affect behavioral consistency, which potentially exposes risks during execution. Furthermore, some strategies overlook resource consumption and feasibility of operations, rendering generated samples hard to deploy under constrained resources. Although ignoring these real-world factors allows samples to bypass detection models, it is a failure in engineering deployment. Therefore, the strategy that regards evasion rate as the only optimization exhibits significant limitations. It is urgent to introduce systemic consideration of disturbance costs and time to enhance sample practicality and concealment.
 
 \end{enumerate}
 
 本文主要的研究目的是借助强化学习和神经网络方法，构建多维度和高效的对抗样本生成方法。针对目前已有研究方法中存在的不足，本文提出以下需要解决的关键问题：
 
+The primary objective of this research is to construct a multidimensional and efficient adversarial sample generation approach utilizing reinforcement learning and neural network methods. Addressing the shortcomings of existing methods, the following critical issues are required to resolve:
+
 关键问题1：如何构建一个具备结构感知和语义控制能力的多维度扰动空间，以适应复杂恶意软件样本的逃逸需求？
+
+Key Issue 1: How to construct a multidimensional disturbance space with structural awareness and semantic control capability to meet the evasion needs of complex malware samples?
 
 关键问题2：如何提升扰动的合法性与良性，避免传统“破坏式扰动”在真实检测系统中反而暴露攻击意图？
 
+Key Issue 2: How to enhance disturbance legitimacy and benignity, avoiding traditional "destructive disturbances" that may expose attack intentions in real detection systems?
+
 关键问题3：如何引入扰动历史建模机制，从而生成更具连贯性和策略性的扰动序列？
+
+Key Issue 3: How to introduce historical disturbance modeling mechanisms to generate more coherent and strategic disturbance sequences?
 
 关键问题4：如何在对抗样本生成过程中权衡扰动有效性、功能完整性与资源开销，提升攻击样本的实际可部署性？
 
-\section{研究的设计思路}
+Key Issue 4: How to balance effectiveness, functional integrity, and resource consumption during adversarial sample generation to enhance the practical deployability of attack samples?
+
+\section{研究的设计思路 Research Design Logic}
 针对当前对抗性恶意软件样本生成方法在扰动手段粗糙、语义控制能力弱、扰动序列缺乏结构性以及忽视现实成本与可部署性等方面的不足，本文提出了一种创新的对抗样本生成框架。现有方法通常依赖简单且随机的字节插入、修改节名称等手段，缺乏对生成样本的合法性、语义一致性以及可执行性的有效控制，导致在实际环境中难以稳定有效地逃避检测。因此，本文的研究思路旨在通过系统性地优化对抗样本生成的多个关键方面，弥补这些不足。
+
+To address current adversarial malware generation methods' limitations in coarse perturbation techniques, weak semantic control, lack of structural disturbance sequences, and neglect of practical costs and deployability, this research proposes an innovative adversarial sample generation framework. Common existing methods rely on simple, random byte insertions or section name modifications that lack effective control over sample legitimacy, semantic consistency, and executability, resulting in unstable evasion in real environments. Therefore, this research aims to solve these shortcomings by systematically optimizing multiple key aspects of adversarial sample generation.
 
 首先，在扰动空间建模方面，本文通过引入多维度扰动技术，打破了传统方法只依赖单一扰动手段的局限，考虑到恶意软件在不同执行阶段可能展现出的多样化特征，设计了一种结构化且具有语义感知能力的扰动策略，从而避免了对文件功能的破坏，同时提高了逃避检测的难度。其次，针对扰动合法性问题，本文提出了一种基于语义一致性的扰动合法性控制方法，确保生成的对抗样本在避开检测的同时，能够维持原有的功能和行为一致性，避免了盲目扰动所带来的不稳定性。
 
+Firstly, in the disturbance space modeling aspect, this paper introduces multidimensional disturbance techniques and breaks the limitation of traditional methods that solely rely on single disturbance methods. Since malware exhibits diverse features in different execution stages, this research designs a structural disturbance strategy with semantic awareness capacities, avoiding file functionality disruption and enhancing evasion difficulties. Secondly, targeting the disturbance legitimacy issue, a disturbance legitimacy control method based on semantic consistency is proposed to ensure adversarial samples evade detection while maintaining original functionality and behavioral consistency, avoiding instability from blind disturbances.
+
 另外，考虑到对抗样本生成过程中的扰动序列具有明显的时序依赖性，本文通过强化学习中的PPO算法结合LSTM网络对扰动序列进行建模，从而有效捕捉扰动操作之间的动态关系，使得生成的扰动序列在整体上更加连贯、隐蔽和具备欺骗性。通过这一方法，能够优化扰动的执行顺序和策略，进一步提升对抗样本的逃避能力。
 
+Furthermore, recognizing the obvious temporal dependency in disturbance sequences, this research employs the PPO algorithm combined with LSTM networks to model disturbance sequences, effectively capturing dynamic relationships between disturbances. This approach enhances the overall coherence, stealth, and deceptive nature of disturbance sequences, optimizing the order and strategies to further improve evasion capabilities.
+
 最后，针对现有方法忽视扰动过程中的成本与可执行性问题，本文提出了一种新的奖励机制，除了关注检测逃逸率外，还考虑了生成过程中的资源消耗、执行时间等因素，确保生成的对抗样本不仅具备较高的攻击性，还能够在实际环境中顺利部署，避免因过于复杂的扰动操作导致样本体积膨胀、运行时间延长或功能丧失。
+
+Lastly, addressing the neglect of disturbance costs and executability, a new reward mechanism is proposed in this research. Except for focusing on evasion rates, it considers different factors such as resource consumption and execution time, ensuring that adversarial samples are not only highly aggressive but also deployable in real environments. This prevents sample size surges, prolonged runtime, or functional loss caused by excessive disturbances.
 
 与传统方法相比，本文具有以下几个显著优点：
 
@@ -57,33 +86,59 @@
 
 \item 结构感知的扰动空间构建：突破以往依赖静态规则或单一字节操作的扰动方式，本文在样本的结构层与语义层中引入更细粒度的操作集，设计出支持多维度、多粒度扰动的操作空间，能够更精准地定位关键行为区域并施加微扰动，从而有效提升逃避检测的灵活性和有效性。
 
+Structurally Aware Perturbation Space Construction: Departing from previous disturbance methods relying on static rules or single-byte operations, this research introduces a finer-grained operation set at the structural and semantic layers of samples, designing an operational space supporting multidimensional and multigranular disturbances, enabling to localize key behavioral regions more precisely and apply subtle disturbances, thereby effectively enhancing the flexibility and effectiveness of evasion detection.
+
 \item 扰动合法性与语义一致性的融合控制机制：不同于以往“只求误判、不管后果”的扰动逻辑，本文在生成过程中引入语义保持约束与合法性验证策略，确保扰动不会破坏程序原有逻辑与可执行性，从而提升对抗样本在真实系统中的稳定性与隐蔽性。
+
+Fusion Control Mechanism for Disturbance Legitimacy and Semantic Consistency: Unlike the previous disturbance logic that only pursues misclassification regardless of consequences, this research incorporates semantic preservation constraints and legitimacy verification strategies during the generation process, which ensures that disturbances do not disrupt the original program logic and executability, enhancing the stability and concealment of adversarial samples in real systems.
 
 \item 考虑扰动历史的序列建模机制：本文将对抗扰动过程视为一个具有时序依赖特征的策略优化任务，引入序列建模机制（如记忆单元或策略网络）来捕捉扰动操作之间的上下文关系，使生成的扰动序列更具策略性与一致性，解决了以往扰动碎片化、冗余化的问题。
 
+Sequence Modeling Mechanism Considering Disturbance History: This research regards the adversarial disturbance process as a strategy optimization task that exhibits temporal dependency characteristics. It introduces sequence modeling mechanisms, such as memory cells or policy networks, to capture the contextual relationships between disturbance operations, which enables the sequences generated to be more strategic and consistent, addressing the previous issues that disturbances are fragmented and redundant.
+
 \item 面向成本与开销的实用性优化目标：本文在对抗目标设计中充分考虑扰动的实施成本、样本运行效率和部署风险等实际因素，引入“轻量扰动”与“开销评估”机制，有效控制扰动规模和复杂度，使生成样本更具工程实用性，避免“虽逃逸成功却难以部署”的局限。
+
+Optimization Objective Oriented towards Cost and Overhead Practicality: In designing the adversarial objectives, this research fully considers practical factors such as disturbance implementation cost, sample runtime efficiency, and deployment risk, introducing "lightweight perturbation" and "overhead assessment" mechanisms to effectively control the scale and complexity of disturbances. This makes the samples generated more practical for engineering deployment, thus avoiding the limitation of being evasive but hard to deploy.
 
 \end{enumerate}
 
-\section{研究的解决方案}
+\section{研究的解决方案 Research Solutions}
 
 针对本文3.1节中当前对抗性恶意软件样本生成方法中存在的扰动手段粗糙、语义控制能力弱、扰动序列缺乏结构性以及忽视现实成本与可部署性等问题，本文提出了一种面向实用性与隐蔽性强化的对抗样本生成框架。该框架从多个维度出发，提出了四个关键解决方案，以提高对抗样本的生成能力、逃避检测效果及实用性。
 
+To address the issues in Section 3.1—that disturbance methods are coarse, weak semantic control, lack of structural disturbance sequences, and neglect practical costs and deployability—this paper proposes a novel adversarial sample generation framework facing practicality and concealment enhancement. This framework focuses on enhancing generation capabilities, evasion effectiveness, and practicality through 4 key solutions.
+
 解决方案1：基于多维度的扰动空间建模
+
+Solution 1: Disturbance Space Modeling Based on Multi-dimensions
 
 传统的对抗样本生成方法通常采用简单的扰动方式，如字节插入、节区名称修改、冗余字段篡改等，这些方法虽然在短期内能够绕过检测，但其扰动空间较为有限，无法有效应对恶意软件复杂执行过程中的多样化特征。为此，本文提出了一种多维度扰动策略，通过精确建模多种扰动维度，从结构、指令、行为三个层面对扰动空间建模以全面覆盖恶意软件在执行过程中可能展现出的行为特征。该策略能够有效提高恶意软件样本的逃避能力和隐蔽性，同时保持样本的功能完整性。在扰动设计中，特别关注对恶意代码执行路径、控制流及其他关键结构的精确干扰，从而最大程度避免传统方法中存在的结构损坏和功能失效的问题。
 
+Traditional adversarial sample generation methods usually employ simple disturbances, such as byte insertion, section name modification, or redundant byte modifications. While these methods may temporarily evade detection, their disturbance space is limited, failing to address the diverse features exhibited during malware execution. To address this issue, this paper proposes a multidimensional perturbation strategy. By precisely modeling various disturbance dimensions, this approach constructs a disturbance space across structural, instruction, and behavioral layers, comprehensively covering potential behavioral features during malware execution. This strategy enhances the evasion and concealment capabilities of malicious samples while preserving their functional integrity. Disturbance design particularly targets precise interference with malicious code execution paths, control flows, and other critical structures, minimizing structural damage and functional failure issues in traditional methods.
+
 解决方案2：基于良性样本的合理化插入扰动
+
+Solution 2: Rationalized Insertion Disturbance Based on Benign Samples
 
 当前许多对抗样本生成方法的扰动通常依赖于随机字节插入等浅层操作，这种方式缺乏对语义合法性和扰动合理性的控制，容易导致生成样本的不稳定性或被检测到。为了解决这一问题，本文提出了一种基于良性样本的合理插入扰动方法。在这一方法中，首先通过分析良性样本的结构与行为，提取出良性样本的语义与字节结构，构建良性样本扰动库。通过对扰动进行更加结构化和语义感知的设计，保证了对抗样本在功能上的完整性和合法性，同时减少了不必要的噪声扰动。这种方法不仅能有效规避基于特征匹配的静态检测系统，还能增强对抗样本在复杂检测环境中的隐蔽性。
 
+Current adversarial sample generation methods often rely on shallow operations, such as random byte insertion, lacking control over semantic legitimacy and disturbance rationality. This can lead samples to be unstable and to be detected easily. To overcome this disadvantage, this paper introduces a rationalized insertion disturbance method based on benign samples. By analyzing the structure and behavior of benign samples, their semantic and byte structure are extracted to build a benign sample perturbation library. This method ensures functional completeness and legitimacy of adversarial samples through more structurally and semantically aware disturbance design, reducing unnecessary noise. It not only effectively evades static detection systems based on feature matching but also enhances sample concealment in complex detection environments.
+
 解决方案3：基于LSTM的PPO时序依赖建模
+
+Solution 3: PPO Temporal Dependency Modeling Based on LSTM
 
 对抗样本的生成不仅仅是每一步独立的扰动操作，而是一个具有时序依赖性的过程。现有方法通常忽略了扰动间的依赖关系，导致生成的扰动序列缺乏整体性和连贯性，从而影响逃避能力。为了解决这一问题，本文结合PPO\cite{yu2022surprising}（Proximal Policy Optimization）强化学习算法和LSTM\cite{graves2012long}（Long Short-Term Memory）模型，提出了一个联合优化的时序依赖建模方法。通过LSTM网络对扰动序列的时序关系进行建模，捕捉扰动之间的内在依赖性，PPO算法则用于优化生成策略。这一方法能够生成更具整体性、连贯性和隐蔽性的扰动序列，有效提升对抗样本的攻击性和稳定性。
 
+Adversarial sample generation is not merely a series of independent disturbances but a process with temporal dependencies. Existing methods often overlook dependencies among different disturbances, resulting in disjointed sequences and reduced evasion capabilities. To solve this issue, this paper combines the PPO Reinforcement Learning algorithm\cite{yu2022surprising} with LSTM\cite{graves2012long} models to propose a joint optimization method for temporal dependency modeling. LSTM networks model temporal relationships in disturbance sequences, capturing intrinsic dependencies among disturbance operations, while PPO optimizes generation strategies. This method produces holistic, coherent, and stealthy disturbance sequences, enhancing adversarial sample attack effectiveness and stability.
+
 解决方案4：基于动态奖励函数的智能体决策
 
+Solution 4: Decision-Making Agent Based on Dynamic Reward Functions
+
 在现有的对抗样本生成方法中，奖励函数设计往往过于简单，通常只关注样本是否成功绕过检测系统，而忽略了生成过程中的成本与效率问题。为了克服这一不足，本文提出了一种基于动态奖励函数的智能体决策机制。该机制不仅考虑逃逸成功与误分类率，还引入了扰动的资源消耗、执行效率、时间开销等因素。通过这种动态奖励机制，智能体在决策过程中能够更好地平衡攻击性与执行代价，从而生成既具备高隐蔽性，又能够快速部署的对抗样本。该方法有效提升了对抗样本的实际应用价值和部署可行性。
+
+Existing adversarial sample generation methods often employ simplistic reward functions focused solely on whether the sample evades the detection systems, neglecting generation costs and efficiency. To address this disadvantage, this research proposes an agent-making mechanism based on dynamic reward functions. Beyond considering evasion success and misclassification rates, it incorporates factors, such as disturbance resource consumption, execution efficiency, and time costs. This dynamic reward mechanism enables agents to balance attack effectiveness with execution costs during decision-making, generating adversarial samples that are both highly stealthy and quickly deployable. This approach significantly enhances the practical application value and deployability of adversarial samples.
 
 \section{研究的整体架构}
 
