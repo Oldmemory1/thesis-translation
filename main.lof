@@ -6,14 +6,14 @@
 \contentsline {figure}{\numberline {2.5}{\ignorespaces LSTM基本数据单元结构}}{36}{figure.caption.13}%
 \contentsline {figure}{\numberline {2.6}{\ignorespaces PPO强化学习模型结构 PPO Refinforcement Learning Model's Structure}}{39}{figure.caption.14}%
 \contentsline {figure}{\numberline {3.1}{\ignorespaces 常见对抗性恶意软件生成模型结构}}{42}{figure.caption.15}%
-\contentsline {figure}{\numberline {3.2}{\ignorespaces 基于强化学习的对抗性样本生成方法框架}}{55}{figure.caption.16}%
-\contentsline {figure}{\numberline {4.1}{\ignorespaces IDA 反汇编 CFG 图}}{63}{figure.caption.22}%
-\contentsline {figure}{\numberline {4.2}{\ignorespaces 指令替换示例图}}{65}{figure.caption.23}%
-\contentsline {figure}{\numberline {4.3}{\ignorespaces 指令重构排序示例图}}{66}{figure.caption.24}%
-\contentsline {figure}{\numberline {4.4}{\ignorespaces 重构的指令有序无环图}}{67}{figure.caption.25}%
-\contentsline {figure}{\numberline {4.5}{\ignorespaces 寄存器保护代码重排序示例图}}{67}{figure.caption.26}%
-\contentsline {figure}{\numberline {4.6}{\ignorespaces 寄存器重分配示例图}}{68}{figure.caption.27}%
-\contentsline {figure}{\numberline {5.1}{\ignorespaces 不同强化学习模型性能训练对比图}}{86}{figure.caption.52}%
-\contentsline {figure}{\numberline {5.2}{\ignorespaces 免杀前后哈勃检测结果对比}}{88}{figure.caption.55}%
-\contentsline {figure}{\numberline {5.3}{\ignorespaces 经对抗性学习后VirusTotal扫描结果}}{93}{figure.caption.58}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces 基于强化学习的对抗性样本生成方法框架}}{57}{figure.caption.16}%
+\contentsline {figure}{\numberline {4.1}{\ignorespaces IDA 反汇编 CFG 图}}{68}{figure.caption.22}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces 指令替换示例图}}{70}{figure.caption.23}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces 指令重构排序示例图}}{71}{figure.caption.24}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces 重构的指令有序无环图}}{72}{figure.caption.25}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces 寄存器保护代码重排序示例图}}{72}{figure.caption.26}%
+\contentsline {figure}{\numberline {4.6}{\ignorespaces 寄存器重分配示例图}}{73}{figure.caption.27}%
+\contentsline {figure}{\numberline {5.1}{\ignorespaces 不同强化学习模型性能训练对比图}}{91}{figure.caption.52}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces 免杀前后哈勃检测结果对比}}{93}{figure.caption.55}%
+\contentsline {figure}{\numberline {5.3}{\ignorespaces 经对抗性学习后VirusTotal扫描结果}}{98}{figure.caption.58}%
 \contentsfinish 
