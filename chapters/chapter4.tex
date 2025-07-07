@@ -1,22 +1,36 @@
-\chapter{基于强化学习的对抗性恶意软件生成方法研究方案}
+\chapter{基于强化学习的对抗性恶意软件生成方法研究方案 Research Solution for Adversarial Malware Generation Technology Based on Reinforcement Learning}
 
 本章将具体地介绍本文提出的对抗样本生成方法的详细设计过程和实现原理，主要包括扰动方法的构建，奖励函数策略的设计，模型的具体结构。
 
-\section{多维度扰动方法的构建}
+This chapter will specifically introduce the detailed design process and implementation principles of the adversarial sample generation method proposed in this research, which mainly includes disturbance methods' construction, the reward function strategies' design, and the model's specific structure.
+
+\section{多维度扰动方法的构建 Multidimensional Disturbance Methods' Construction}
 
 本文利用lief库、IDA pro对二进制可执行样本进行批量处理。LIEF（Library to Instrument Executable Formats）是一个开源的库，用于处理ELF、PE和Mach-O格式的可执行文件。它可以解析和修改二进制文件的头部信息、节区、符号和动态链接。LIEF适用于静态分析、重命名符号、插入代码和文件格式转换等任务。LIEF可以提取二进制可执行文件的结构，以及提供各个结构的操作接口。
 
-\subsection{结构化扰动方法}
+This research batch processes binary executable samples using the LIEF library and IDA Pro. LIEF (Library to Instrument Executable Formats) is an open-source library for processing executable files in ELF, PE, and Mach-O formats. It can parse and modify header information, sections, symbols, and dynamic linking in binary files. LIEF is applicable to tasks such as static analysis, symbol renaming, code insertion, and file format conversion. LIEF can extract the structure of binary executable files and provide operation interfaces for various components.
+
+\subsection{结构化扰动方法 Structural Disturbance Methods}
 
 在恶意软件的对抗性样本生成过程中，结构层面的扰动指的是通过修改文件的内部结构来引入变化，这种变化通常不会影响文件的执行逻辑，但能够有效地逃避传统的检测方法。结构层面的扰动包括但不限于文件的节区、导入符号、动态库、以及压缩/解压缩等操作。
 
+In the adversarial malware sample generation process, structural level disturbances refer to introducing changes by modifying a file's internal structure. These changes commonly do not affect the file's execution logic but effectively evade traditional detection methods. Structural level disturbances include operations on sections, imported symbols, dynamic libraries, compression, and decompression, but are not limited to these.
+
 这些扰动主要关注的是通过改变文件结构中的某些元素来达到以下目的：
+
+These disturbances primarily concentrate on achieving the following purposes by altering certain elements in the file structure:
 
 增加文件的不可预测性：通过随机化或改变文件的某些部分，使得检测系统很难依赖固定模式进行识别。
 
+Increasing file unpredictability: By randomizing or changing parts of the file, detection systems hardly identify the file, relying on fixed patterns.
+
 避开静态分析：静态分析工具通常依赖文件的固定结构特征，如节区（Section）、符号表、导入表等。通过扰动这些结构，可以增加检测的难度。
 
+Evading static analysis: Static analysis tools often depend on fixed file structural features, such as sections, symbol tables, and import tables. Disturbing these structures increases detection difficulty.
+
 防止签名匹配：一些恶意软件检测工具依赖于已知恶意样本的特征（如哈希值、节区结构等）进行匹配。通过扰动结构，可以使文件与原始恶意样本在这些特征上产生差异，从而避开检测。
+
+Avoiding signature matching: Some malware detection tools rely on known signatures, such as values, section structures from malicious samples. Disturbing structures creates differences between the file and the original malicious sample in these signatures, enabling evasion.
 
 （1）节区（Section）扰动
 
