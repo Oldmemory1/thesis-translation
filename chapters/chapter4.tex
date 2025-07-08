@@ -202,9 +202,11 @@ The target of section header table disturbances is altering the apparent charact
 	\end{tabular*}
 \end{table}
 
-\subsection{指令扰动方法}
+\subsection{指令扰动方法 Instruction Disturbance Methods}
 
 在本研究中，本文使用强大的反汇编工具 IDA Pro 对 ELF 格式的恶意软件样本进行静态分析与代码提取，为后续的语义保持扰动操作奠定基础。尽管对于剥离符号信息（如符号表、调试信息）的 x86 架构 ELF 可执行文件，难以做到完全精确的反汇编，但现有的高级反汇编器（如 IDA Pro）已可通过多种技术手段对主流编译器生成的代码实现较高覆盖率。这些手段包括：多种反汇编算法的结合使用、对特定代码结构的识别、以及简单的数据流分析等。在处理 ELF 文件时，IDA Pro 通过识别符号信息和程序头表中的节区（如 .text、.plt、.rela.plt 等），能够较准确地定位函数边界，识别控制流，并生成基本块图和函数调用图，帮助提取语义稳定的指令区域进行变换。
+
+In this research, powerful disassembly tools like IDA Pro are adopted to perform static analysis and code extraction on ELF-format malware samples, establishing a foundation for subsequent disturbance operations that ensure semantics. Although achieving fully precise disassembly remains challenging for stripped symbols like missing symbol tables and debugging information ELF executables on x86 architecture, advanced current disassemblers like IDA Pro can achieve high coverage for code generated from prevalent compilers through combined disassembly algorithms, recognition of specific code structures, and basic data-flow analysis. When processing ELF files, IDA Pro identifies symbol information and sections in the Program Header Table, such as .text, .plt, .rela, and .plt, enabling locating function boundaries accurately, recognizing control flow, and generating basic block graphs and function call graphs. This facilitates the extraction of semantically stable instruction regions for transformation.
 
 \begin{figure}[hbt]
 	\centering
@@ -216,7 +218,11 @@ The target of section header table disturbances is altering the apparent charact
 
 为确保扰动操作不影响原始程序逻辑，本文首先将反汇编得到的指令转换为一种自定义的中间表示（IR），该表示能记录每条指令的操作码、显式与隐式操作数、寄存器读写关系、以及影响到的标志位等静态语义信息。这种增强表示形式可有效辅助分析控制依赖与数据依赖关系，识别出可安全修改的指令区域。随后，本文实施三种语义保持的扰动技术：指令替换（Instruction Substitution）、指令重排序（Instruction Reordering） 和 寄存器重分配（Register Reallocation）。这三类方法分别从指令级别、顺序层级和寄存器使用层面引入扰动，旨在保持语义不变的前提下实现样本多样性和模型鲁棒性提升。
 
+To ensure disturbances do not disrupt the original program logic, the disassembled instructions are first transformed into a custom Intermediate Representation (IR). This IR records each instruction's static semantic information, such as opcode, explicit and implicit operands, register read and write relationships, and impacted flag bits, which effectively aids in analyzing control and data dependencies to identify safely modifiable instruction regions. Subsequently, three disturbance techniques—Instruction Substitution, Instruction Reordering, and Register Reallocation—ensure semantics are implemented. These methods respectively introduce disturbances at the instruction level, sequential layer, and register usage level, aiming to enhance sample diversity and model robustness while preserving semantics.
+
 在变换过程中，所有修改操作均限制在已识别的、无控制依赖冲突的基本块内部，确保程序控制流图（CFG）保持稳定。如果某些变换操作（如指令顺序调整）导致代码地址偏移，本文会同步更新 ELF 文件中的相关重定位信息（如 .rela.text 段），以避免函数调用或跳转地址错误。整个扰动流程针对每个 ELF 文件独立执行，可自动生成多个等价但具有不同语法表现的扰动样本，用于训练或测试阶段的多样化增强，从而有效提升基于静态分析的恶意代码检测系统的鲁棒性。
+
+During transformation, all modifications are limited to identified basic blocks free of control dependency conflicts, ensuring Program Control Flow Graph (CFG) stability. If transformations like instruction resequencing cause code address shifts, relevant relocation information, such as .rela section and .text section, in the ELF file is synchronously updated to prevent faulty function call and jump address. This process executes per ELF file independently, automatically generating multiple syntactically distinct yet semantically equivalent adversarial samples. These enhance diversity in training and testing phases, effectively improving the robustness of malware detection systems based on static analysis.
 
 （1） 指令替换（Instruction Substitution）
 
