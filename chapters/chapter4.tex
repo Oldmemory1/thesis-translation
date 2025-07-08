@@ -163,13 +163,23 @@ Decompression: Compressed ELF files are decompressed to their original state dur
 
 （5）Go语言的go-bindata工具包装ELF文件
 
+(5) go-bindata Toolbox in Go for Packaging ELF Files
+
 go-bindata是一个Go工具，旨在将二进制文件（如ELF文件、图片、音频文件等）转化为Go源代码中的字节数组。在恶意软件分析领域，通过将ELF文件嵌入到Go程序中，可以有效隐藏ELF文件的实际内容，并增加静态分析和反向工程的难度。具体而言，go\_bindata\_wrapper方法通过将ELF文件转换为Go代码，实现在Go程序中隐藏ELF文件的功能。这种方式使得恶意文件能够避开常规的静态检测和签名匹配工具。
+
+go-bindata is a Go tool designed to convert binary files, such as ELF files, images, and audio files, into byte arrays within Go source code. In the malware analysis realm, embedding ELF files into Go programs effectively conceals their actual content and increases the difficulty of static analysis and reverse engineering. Specifically, the go\_bindata\_wrapper method converts ELF files into Go code to hide their functionalities in Go programs, which enables malicious files to evade common static detection and signature-matching tools.
 
 go-bindata工具的作用：go-bindata工具将任何二进制文件（如ELF文件）嵌入到Go源代码中，并生成一个包含文件内容的Go文件。在程序运行时，生成的Go文件将包含文件的字节数组，这些字节数据可以被Go程序读取，并用于恢复原始文件内容。此方法使得ELF文件内容隐藏在Go源代码中，从而增加了恶意软件在反向工程过程中的隐蔽性。
 
+Function of the go-bindata tool: The go-bindata tool embeds any binary file like ELF files into Go source code, generating a Go file containing the file's content. When the file is executed, this generated Go file includes a byte array that the Go program can read to recover the original file's content. This method hides ELF file content in Go source code, enhancing the concealment of malware during reverse engineering.
+
 通过go-bindata工具将ELF文件转换为Go源代码，并生成一个Go文件，Go文件中包含该ELF文件的字节数据。通过Go编译器将包含ELF文件字节数据的Go代码编译成最终的Go可执行文件。ELF文件在运行时会被读取并恢复，执行原始文件的操作。
 
+First, convert the ELF file into Go source code using the go-bindata tool, generating a Go file containing the ELF file's byte data. Then, compile this Go code that contains the ELF byte data into a final Go executable program using the Go compiler. At runtime, the ELF file is read and recovered to execute its original operations.
+
 通过go-bindata工具，go\_bindata\_wrapper方法为恶意文件提供了一种新的隐蔽方式，将ELF文件嵌入到Go程序中，从而有效地规避静态分析工具和签名匹配的检测。
+
+Through the go-bindata tool, the go\_bindata\_wrapper method provides a novel concealment approach for malicious files by embedding ELF files into Go programs, thus effectively evading static analysis tools detection and signature matching.
 
 （6）节头表修改
 
