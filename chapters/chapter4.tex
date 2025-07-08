@@ -69,13 +69,23 @@ The section disturbance design in this paper is listed in Table \ref{tab:4.1}.
 
 （2）导入符号和库扰动
 
+(2) Imported Symbol and Library Disturbance
+
 ELF文件中的导入符号表（dynamic symbol table）包含了程序运行时需要链接的外部函数或库。通过扰动这些符号，可以使恶意软件的行为更加不可预测。例如：
+
+The dynamic symbol table in ELF files contains external functions or libraries that require runtime linking. Disturbing these symbols can make malware behavior more unpredictable. For example:
 
 添加恶意符号：将恶意的动态符号（如恶意函数名）添加到文件中，或者通过与良性文件进行符号混合，增加文件的复杂性。
 
+Adding malicious symbols: Inserting malicious dynamic symbols such as malicious function names into the file or mixing symbols with benign files to increase complexity.
+
 修改库依赖：修改ELF文件所依赖的动态库，使其依赖于一个不存在或不常见的库，从而打乱传统的静态分析过程。
 
+Modifying library dependencies: Altering ELF dependency libraries that do not exist or are not common disrupts traditional static analysis processes.
+
 本文设计的导入符号和库扰动如表\ref{tab:4.2}所示。
+
+The imported symbol and library disturbances designed in this paper are listed in Table \ref{tab:4.2}.
 
 \begin{table}[htbp]
 	\centering
