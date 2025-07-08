@@ -371,17 +371,27 @@ This technique does not introduce any new instructions or change operand values,
 	\caption{寄存器重分配示例图}\label{fig:4.6}
 \end{figure}
 
-\subsection{动态行为扰动方法}
+\subsection{动态行为扰动方法 Dynamic Behavior Disturbance Methods}
 
 在恶意软件检测领域，动态分析技术是当前主流手段之一，尤其在处理未知样本或多态变种时具有明显优势。其基本原理是通过在受控执行环境（如沙箱、虚拟机、内存监控器）中运行目标程序，记录其在运行过程中所触发的系统调用、行为路径、内存修改、网络通信等信息，以此识别潜在的恶意行为。然而，这一技术在实际部署中往往存在时间资源受限的问题。为了兼顾效率与成本，动态分析系统通常仅为每个样本分配数秒到几十秒的执行时间窗口。对于某些攻击行为触发依赖于条件判断、用户交互的恶意样本而言，这一固定的分析时间窗显然存在被规避的可能性。
 
+In the malware detection realm, dynamic analysis technology is one of the currently prevalent approaches, demonstrating clear advantages when handling unknown or polymorphic variants. Its fundamental principle involves running target programs in controlled execution environments, such as sandboxes, virtual machines, and memory monitors, recording triggered system calls, behavioral paths, memory modifications, network communications, and other runtime information to identify potential malicious behaviors. However, this technology often faces time and resource constraints during deployment. To balance efficiency and cost, dynamic analysis systems commonly allocate only a few seconds to dozens of seconds of execution time to each sample. For malware whose attack behaviors depend on conditional triggers or user interaction, this fixed analysis window presents a probability of being evaded.
+
 基于此观察，本文设计了一种动态扰动方法，核心思想是引入“时间延迟”机制，使恶意代码在样本启动后故意等待一段时间再执行核心逻辑，从而躲避沙箱的行为分析窗口。其主要实现方式是通过在程序入口点或关键路径中插入延迟逻辑（如 nanosleep系统调用），使恶意样本在运行初期不表现任何异常行为，从而骗过基于行为特征的检测系统。
+
+Based on this observation, this research designs a dynamic disturbance method whose central mechanism is introducing "time-delay", deliberately waiting for a period after startup before executing core logic, making the malicious code evade the behavioral analysis window of sandboxes. This is primarily implemented by inserting delay logic like the nanosleep system call at program entry points or critical paths, ensuring that the malware exhibits no abnormal behavior during the initial run phase and thus bypasses detection systems based on behavioral features.
 
 具体而言，该方法在程序入口\_start 中插入一段系统调用延迟逻辑，构造一个 timespec结构体设置延迟时间（如60秒），并通过nanosleep系统调用实现挂起效果。在延迟期间，样本处于休眠状态，不触发任何系统调用，也不进行内存读写、网络通信等可疑操作。由于大多数沙箱系统会在执行时间到达后强制中止进程，此时还未触发的恶意行为链将完全无法被观测到。这样，恶意样本即使具有明显的破坏性，也可能因“未表现行为”而被误判为正常程序。
 
+Specifically, this method inserts system call delay logic at the \_start entry point. It constructs a timespec structure to set the delay duration and invokes the nanosleep system call to induce suspension. During this delay, the sample remains dormant, triggering no system calls, memory reads and writes, network communications, or other suspicious activities. As most sandbox systems forcibly terminate processes after exceeding the execution time limit, the un-triggered malicious behavioral chain remains entirely unobserved. Consequently, even obviously destructive malware may be misclassified as benign due to "absence of malicious behavior."
+
 该策略可归类为一种“动态行为隐藏技术”，其本质在于对行为时间的扰动，从时间维度上对抗行为检测系统。这类技术的优势在于实现成本低、兼容性好且对原有逻辑无破坏性，能够与其他扰动策略（如控制流平坦化、代码插桩、系统调用替换）联合使用，从而形成更强的检测对抗能力。
 
+This strategy can be classified as a "dynamic behavior concealment technique." Its essence is using timing disturbance behavior to counter detection systems temporally. Its advantages include low implementation cost, high compatibility, and non-destructive impact on original logic. It can also be combined with other disturbance strategies, such as control-flow flattening, code instrumentation, and system call replacement to form more robust evasion capabilities.
+
 值得注意的是，虽然该策略在现实场景中具有较强的隐蔽性，但其也可能被高级动态检测系统检测到。例如某些系统会使用加速执行技术（如时间跳跃模拟）、分析行为间歇性、或启用用户交互模拟等手段来破除延迟机制。因此，未来仍需结合其他对抗策略，共同提升样本的免杀能力和对抗鲁棒性。
+
+It is notable that this technique may still be detected by advanced dynamic analysis systems while having effective concealment in real scenarios. For example, some systems may employ execution acceleration techniques such as time-jump simulation, behavioral intermittency analysis, and user-interaction simulation, to counter delays. Therefore, future work should integrate other adversarial strategies to jointly enhance evasion and robustness.
 \begin{algorithm}[htbp]
 	\caption{使用可执行段填充空间进行 ELF 动态插入算法}
 	\KwIn{目标 ELF 二进制文件路径 \texttt{input\_elf}，载荷二进制代码路径 \texttt{code\_bin}，输出 ELF 路径 \texttt{output\_elf}}
@@ -412,11 +422,11 @@ This technique does not introduce any new instructions or change operand values,
 
 基于时间延迟的动态扰动方法是一种有效的动态对抗技术，具有实现简单、效果明显、通用性强等优点，可作为恶意样本在强化学习训练与对抗生成中的关键扰动操作之一，具体实现如算法1所示。
 
+The disturbance method based on time delay is an effective dynamic adversarial technique that has advantages in simple implementation, high efficiency, and high versatility. It serves as a key disturbance operation for malware in reinforcement learning training and adversarial generation. Its concrete implementation is described in Algorithm 1 below.
 
 算法1通过逐步操作，实现将载荷二进制代码动态插入到目标ELF可执行文件的可执行段填充空间中，保持原文件结构的同时实现控制流重定向。第1至2行将目标ELF文件与待插入的payload读入内存。第3至4行验证ELF文件的合法性，包括magic、是否为64位及是否为x86-64架构。第5至17行是注入的核心步骤：遍历每个程序头，第6行判断是否为可执行段（具有PF\_X标志），第7至8行定位该段的最后一个节并计算其后的空隙空间大小；若填充不足以插入payload与跳转指令，则退出（第9至10行）。第11至13行将载荷写入空隙并附加一段跳转回原始入口点的代码。随后，第14至15行扩展节和段的大小字段以覆盖新注入区域，确保在运行时被正确加载。第16行更新ELF头中的入口地址e\_entry为payload的起始位置，实现控制流重定向。完成注入后（第17行），退出循环以防止重复操作。最后，第18至19行将修改后的ELF写入输出文件并设置为可执行。整体流程在不破坏原有功能的前提下，实现了高隐蔽性和完整性兼容的动态插入操作。
 
-
-
+Algorithm 1 operates step-by-step, achieving inserting payload binary code into target ELF executable file's executable segment padding, maintaining original file structure while achieving control flow redirection. Lines 1 to 2 read target ELF file and payload into memory. Lines 3 to 4 check the legitimacy of ELF file, including magic number, whether it is 64 bits, and whether its architecture is x86-64. Lines 5 to 17 is the core process of injection, traversing each program header. Line 6 judges whether the segment is an executable segment that contains the PF\_X flag. Lines 7 to 8 locate the last section of this segment and calculate the gap size after it. Lines 9 to 10 terminate the process when the gap size cannot accommodate the payload and jump instructions. Lines 11 to 13 write the payload to the gap and append code block that jumps to the original entry point. Subsequently, lines 14 to 15 expand the size fields of the section and segment to cover newly injected areas to ensure that it can be loaded correctly during execution. Line 16 updates the entry point e\_entry in the ELF header to be the starting point of payload, achieving control flow redirection. Line 17 exits the loop to prevent duplicate operations after the injection is completed. Finally, lines 18 to 19 write the modified ELF file to an output file and set it as an executable file. The overall process achieves dynamic insertion operations that exhibit high concealment and complete compatibility in the condition that the original functionality is not broken.
 
 \section{动态奖励函数策略优化（DRFOS）}
 
