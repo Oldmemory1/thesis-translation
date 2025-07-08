@@ -34,14 +34,23 @@ Avoiding signature matching: Some malware detection tools rely on known signatur
 
 （1）节区（Section）扰动
 
+(1) Section Disturbance
+
 在ELF（Executable and Linkable Format）文件中，节区是文件的基本构建单元。它们存储了不同类型的数据（如代码、数据、符号等）。通过对节区内容进行扰动，可以修改文件的行为或使其变得更加复杂。常见的节区扰动方式包括：
+
+In ELF files, sections are the fundamental units, storing different types of data, such as code, data, symbols. Disturbing section content can modify file behavior or increase its complexity. Common section perturbation methods include:
 
 节区内容的修改：例如，在现有节区中附加随机数据、将特定节区的数据替换为 benign 数据（如无害的字符串或二进制内容）等。这样可以增加恶意文件的复杂性并避免与已知恶意样本的特征匹配。
 
+Modifying section content: For example, appending random data to existing sections or replacing data in specific sections with benign data like harmless strings or binary content increases malicious files’ complexity and avoids matching known malicious sample signatures.
+
 节区重命名：将节区名称修改为常见的名称或随机名称，使得检测工具无法轻易识别文件中的关键节区，如 .text 节区，通常包含程序代码。
+
+Renaming sections: Changing section names to common or random names makes it harder for detection tools to identify critical sections, especially the .text section that contains program code.
 
 本文设计的节区扰动如表\ref{tab:4.1}所示。
 
+The section disturbance design in this paper is listed in Table \ref{tab:4.1}.
 
 \begin{table}[htbp]
 	\centering
