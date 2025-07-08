@@ -298,11 +298,23 @@ Through the methods above, instruction replacements not only maintain the progra
 
 （2）指令重排序（Instruction Reordering）
 
-基本块内部指令重排（Intra Basic Block Reordering）：在一个基本块（Basic Block）中，若两条或多条指令之间没有数据或控制依赖关系，那么它们的执行顺序就是可以互换的。由于基本块是线性执行的中间代码区域，并且编译器在生成机器码时只是选择了若干等效顺序之一，因此只要保证依赖关系不变，修改指令顺序不会影响程序的功能。
+(2) Instruction Reordering
+
+基本块内部指令重排（Intra Basic Block Reordering）：
+
+Intra Basic Block Reordering:
+
+在一个基本块（Basic Block）中，若两条或多条指令之间没有数据或控制依赖关系，那么它们的执行顺序就是可以互换的。由于基本块是线性执行的中间代码区域，并且编译器在生成机器码时只是选择了若干等效顺序之一，因此只要保证依赖关系不变，修改指令顺序不会影响程序的功能。
+
+In a basic block, instructions without data and control dependencies can be reordered without affecting functionality. Since basic blocks are intermediate code areas for linear execution, and the compiler only selects one of equivalent sequences during machine code generation, thus instruction sequence modification does not affect the program's functionality if the dependency relationship remains unchanged.
 
 本文对目标二进制程序进行反汇编，提取所有基本块。对每个基本块进行依赖分析，识别每条指令的读（use）和写（def）寄存器集。通过检测读后写（RAW）、写后读（WAR）、写后写（WAW）等依赖类型，构建出指令间的有向无环图（DAG）。
 
+This research disassembles target binaries to extract all basic blocks, then perform dependency analysis on each block, identifying each instruction's use and def register sets, constructing a Directed Acyclic Graph (DAG) among instructions by detecting RAW (Read-After-Write), WAR (Write-After-Read), and WAW (Write-After-Write) dependencies.
+
 之后，使用拓扑排序枚举该图的合法指令顺序，并从中随机选取一种新的顺序，替代原始顺序。这一方法不会引入新的指令或修改指令操作数，因此保持程序的功能完全不变。它可以扰乱基于指令顺序或特征码的静态分析和检测机制，有效提升样本的多样性。
+
+Subsequently, this research enumerates legal instruction orders via topological sorting and randomly selects a new order to replace the original. This method can maintain the program's functionality because it does not introduce any new instructions or modify instruction operands. It disrupts static analysis mechanisms relying on instruction order or signatures, enhancing sample diversity.
 
 \begin{figure}[hbt]
 	\centering
@@ -311,9 +323,17 @@ Through the methods above, instruction replacements not only maintain the progra
 	\caption{指令替换示例图}\label{fig:4.2}
 \end{figure}
 
-寄存器保护代码重排（Reordering of Register Preservation Code）：该方法基于函数调用时保存非易失性寄存器（callee-saved registers）所使用的push和pop指令的顺序是可变的，只要遵循“先进后出”的栈规则即可。即，函数在开头会使用若干push指令保存寄存器，函数结尾使用对应的pop恢复值。因为栈是倒序恢复的，所以只要保持pop顺序与push顺序相反，整个过程的语义就是等效的。
+寄存器保护代码重排（Reordering of Register Preservation Code）：
+
+Reordering of Register Preservation Code:
+
+该方法基于函数调用时保存非易失性寄存器（callee-saved registers）所使用的push和pop指令的顺序是可变的，只要遵循“先进后出”的栈规则即可。即，函数在开头会使用若干push指令保存寄存器，函数结尾使用对应的pop恢复值。因为栈是倒序恢复的，所以只要保持pop顺序与push顺序相反，整个过程的语义就是等效的。
+
+This method is based on the theory that the sequence of push and pop instructions from callee-saved registers is alterable during function calls, which only need to follow the last-in-first-out (LIFO) stack rule. During function calls, the order of push (callee-saved registers) and corresponding pop instructions can vary if adhering to the last-in-first-out (LIFO) stack rule. Several push instructions are used by the function header to save data in registers, while corresponding pop instructions are used at the end of the function to restore values. Since the stack restores in reverse order, semantics during the entire process will be equivalent to the original if pop sequences are the opposite of push sequences.
 
 本文在函数的入口和出口识别出完整的寄存器保存/恢复代码段。对这些push和pop指令进行配对，确认其保护的是相同的寄存器，并追踪栈指针（ESP）的变化确保没有中间干扰。然后，对push序列进行重排，并将pop序列同步做相反的重排，确保恢复顺序正确。若push序列中夹杂有其他非保存性指令，也需进行依赖分析，保证重排不会打乱依赖顺序。这种方法对程序语义无影响，但能干扰基于特定pop序列模式的分析方法，提高静态分析、指令特征提取和样本分类的复杂度。
+
+This research identifies complete register save and restore code segments at the function entry and exit. Then pair push and pop instructions, ensuring that they operate on the same registers and track ESP changes to avoid other interference. Subsequently, reordering the push sequence and applying inverse reordering to pop sequence ensures restore proper sequence. If the push sequence contains other non-preservation instructions, dependency analysis is also essential to ensure that reordering does not disrupt dependency sequence. This method has no impact on the program's semantics but disturbs analysis methods based on specific pop sequence patterns, improving resistance to static analysis, instruction feature extraction, and classification.
 
 \begin{figure}[hbt]
 	\centering
@@ -338,7 +358,11 @@ Through the methods above, instruction replacements not only maintain the progra
 
 本文首先对二进制程序构建控制流图（CFG），并对每个基本块进行寄存器活跃性分析，获取每条指令的寄存器use（使用）与def（定义）集合。接着迭代计算每条指令的活跃输入集（in）与输出集（out），识别每个寄存器的活跃区域。在确保无冲突的前提下，随机选择两个不重叠活跃区的寄存器对，将其在汇编中的使用位置进行替换。指令修改时，通过变更ModR/M字节（必要时SIB字节）实现重映射，避免使用esp等特殊寄存器，并对隐式使用寄存器的指令进行过滤。为保证调用一致性，还需结合调用约定信息约束某些寄存器的使用。
 
+First, this method constructs the CFG for the binary program and performs register liveness analysis on each basic block to determine each instruction's register use and def sets. Second, this method iteratively computes each instruction's active in and out sets to identify live ranges in each register. On the premise that there is no conflict, two register pairs with non-overlapping live ranges are randomly selected, and then their usage positions are swapped in assembly. During instruction modification, modifying via ModR/M bytes (and SIB bytes if necessary) achieve remapping, avoiding special registers like ESP, filtering instructions with implicit register usage. To ensure call consistency, calling convention information is combined to constrain certain registers.
+
 这一方法不会引入新指令或修改操作数值，仅在机器码层面更换寄存器编号，因此程序行为保持完全一致。该技术能有效打乱静态分析工具基于寄存器使用模式或特征序列的识别策略，从而提升样本的对抗性与多样性。
+
+This technique does not introduce any new instructions or change operand values, modifying only register encodings at the machine-code level. It disrupts static analysis tools based on register usage patterns or feature sequences recognition strategies, enhancing sample adversariality and diversity.
 
 \begin{figure}[hbt]
 	\centering
