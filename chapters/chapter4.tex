@@ -134,11 +134,19 @@ Appending benign binary content: Inserting sections or binary content extracted 
 
 （4）压缩与解压缩（UPX打包与解包）
 
+(4) Compression and Decompression (UPX Packing and Unpacking)
+
 压缩恶意文件是另一种常见的扰动技术。通过使用UPX等压缩工具对ELF文件进行压缩，可以隐藏文件的原始结构，并使文件在未经解压时不可执行。这种方法主要有以下特点：
+
+Compressing malicious files is another common disturbance technique. Compressing ELF files using tools like UPX can hide the original file structure and make the file non-executable without decompression. This approach primarily has the following features:
 
 压缩：压缩文件可以改变文件的内部结构，使其看起来与原始文件完全不同，从而避开基于特征的检测。
 
+Compression: Compressed files alter the file's internal structure, making it appear entirely different from the original, thereby evading detection based on features.
+
 解压缩：压缩的ELF文件在运行时会被解压缩回原始状态，因此需要额外的解压步骤。通过这种方式，恶意软件的行为和文件结构可以被“隐藏”在压缩层后面，增加了反向工程和静态分析的难度。
+
+Decompression: Compressed ELF files are decompressed to their original state during runtime, requiring an additional decompression step. This method allows malicious software behaviors and file structures to be hidden behind the compression layer, increasing the difficulty of reverse engineering and static analysis.
 
 \begin{table}[htbp]
 	\centering
