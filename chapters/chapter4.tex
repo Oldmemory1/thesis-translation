@@ -226,34 +226,75 @@ During transformation, all modifications are limited to identified basic blocks 
 
 （1） 指令替换（Instruction Substitution）
 
+(1) Instruction Substitution
+
 指令替换作为一种二进制代码扰动方法，旨在通过将原始指令替换为等效的指令来扰乱程序的结构，同时保持程序的功能不变。该方法不仅能改变代码的外观，还能增加静态分析和逆向工程的难度。以下是指令替换的具体细节：
 
-等效指令替换在x86架构中，许多指令有多个等效形式，可以用不同的操作数或指令格式来实现相同的功能。例如：
+Instruction substitution serves as a binary code disturbance method that alters program structure by replacing original instructions with equivalent ones while preserving program functionality. It not only disrupts code appearance but also increases the difficulty for static analysis and reverse engineering. Details are described as follows:
 
+等效指令替换：
+
+Equivalent Instruction Replacement:
+
+在x86架构中，许多指令有多个等效形式，可以用不同的操作数或指令格式来实现相同的功能。例如：
 add r/m32, r32 可以替换为 add r32, r/m32，这两者在操作数为寄存器时是等效的。
+
+On x86 architecture, many instructions have multiple equivalent forms, same functionality can be achieved by different operands and instruction forms.For example, “add r/m32, r32” can be replaced with “add r32, r/m32”, these two instructions are equivalent while operands are registers.
 
 对于逻辑操作，test r/m8, r8 可以与 test r/m8, r/m8 等价。
 
+For logic operations, “test r/m8, r8” is equivalent to “test r/m8, r/m8”.
+
 一些算术指令也有多个等效形式，比如 sub r/m32, r32 可以用 neg r/m32 替换（减法可以通过取负来实现）。
+
+Some arithmetic instructions also have multiple equivalent forms, such as “sub r/m32, r32” can be replaced with “neg r/m32”.
 
 操作数形式替换指令时，可以改变操作数的形式，而不影响最终的计算结果。例如，mov r32, r/m32 和 mov r/m32, r32 都是等效的操作，但通过改变源和目标操作数的顺序，能够改变指令的字节表示。
 
-不同长度指令某些情况下，可以用长度相同但操作不同的指令替换原始指令，例如：
+Operand forms can be altered when instructions are replaced, and do not affect ultimate calculation result. For example, “mov r32, r/m32” and “mov r/m32, r32” are equivalent operations, but the instruction byte expression can be altered by changing the sequence of source and target operands.
 
+不同长度指令某些情况下，可以用长度相同但操作不同的指令替换原始指令，例如：
 inc r32可以替换为 add r32, 1，二者功能相同，但指令长度和编码不同。
+
+In some circumstances, replacing original instructions with instructions that are the same length but different in operations are permitted.
+For example, “inc r32” can be replaced with “add r32, 1”, these two instructions have same functionality, different instruction length and coding.
 
 dec r32可以替换为 sub r32, 1，实现同样的效果，增加了代码的复杂性。
 
-替换控制流指令 控制流指令（如跳转、条件跳转、调用等）也可以用等效的指令替换。例如：
+“dec r32” can be replaced with “sub r32, 1”, these two instructions have same effect, but increase code's complexity.
+
+替换控制流指令：
+
+Control Flow Instruction Replacement:
+
+控制流指令（如跳转、条件跳转、调用等）也可以用等效的指令替换。例如：
 jmp label 可以用 call label; pop 来替换，虽然实现了相同的跳转效果，但操作数和指令形式不同。
+
+Control flow instructions, such as jump, conditional jump, and call, can be replaced with equivalent instructions. For example, “jmp label” can be replaced with “call label; pop”, although two instructions achieve same jump result, but their operands and instruction forms are different.
 
 je（等于跳转）可以替换为 jne（不等于跳转），并通过适当调整标志位来维持功能一致性。
 
-确保指令长度一致由于对于许多stripped二进制文件，增加指令长度可能会导致代码结构破坏，因此在替换过程中要保证每条替换的指令与原指令长度相同。可以通过选择长度一致的等效指令来实现这一点，避免扰乱程序的整体布局。
+“je” can be replaced with “jne” by adjusting the flags properly to maintain functional consistency.
 
-随机化替换的应用方式在替换指令时，可以根据一定的规则或随机选择等效指令来应用这些替换。替换不一定是对每条指令都应用，而是根据程序的特性和分析结果，选择性地对特定代码块进行替换。这种方法可以确保替换不会影响程序的控制流和逻辑结构，但同时会改变程序的外观，增加静态分析的难度。
+确保指令长度一致：
+
+Maintain instruction length consistency:
+
+由于对于许多stripped二进制文件，增加指令长度可能会导致代码结构破坏，因此在替换过程中要保证每条替换的指令与原指令长度相同。可以通过选择长度一致的等效指令来实现这一点，避免扰乱程序的整体布局。
+
+Increasing instruction length may cause code structure to be broken in many stripped binary files; thus, it is vital to ensure that each replaced instruction's length should be the same as the original. This can be achieved by selecting equivalent instructions that have the same length, avoiding disrupting the program's overall layout.
+
+随机化替换的应用方式：
+
+The application method of randomized replacement:
+
+在替换指令时，可以根据一定的规则或随机选择等效指令来应用这些替换。替换不一定是对每条指令都应用，而是根据程序的特性和分析结果，选择性地对特定代码块进行替换。这种方法可以确保替换不会影响程序的控制流和逻辑结构，但同时会改变程序的外观，增加静态分析的难度。
+
+Replacements can be applied according to certain rules or randomized equivalent instruction selection. Replacements may not be applied to each instruction but are selectively applied to specific code blocks relying on program characteristics and analysis results. This method can ensure that replacements do not affect the program's control flow and logic structure but alter the program's appearance, increasing static analysis difficulty.
 
 通过以上方法，指令替换不仅保持程序功能的完整性，还有效增加了程序的混淆性，使得静态分析工具更难识别程序的真实意图，增加了逆向工程的复杂性。
+
+Through the methods above, instruction replacements not only maintain the program's complete functionalities but also increase the program's obfuscation, making it harder for static analysis tools to recognize the program's real intention and increasing the complexity of reverse engineering.
 
 （2）指令重排序（Instruction Reordering）
 
