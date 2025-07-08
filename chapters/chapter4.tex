@@ -103,11 +103,19 @@ The imported symbol and library disturbances designed in this paper are listed i
 
 （3）随机数据附加（Overlay）
 
+(3) Random Data Appending (Overlay)
+
 Overlay技术通过在文件末尾添加随机数据（通常是无害数据或伪装数据），可以在不改变文件执行流程的情况下修改文件的大小和结构。这种技术常用于恶意软件中以绕过基于签名的检测。常见的技术包括：
+
+Overlay techniques involve appending random data that is commonly harmless or disguised to the end of a file, altering its size and structure without changing execution logic. This technique is commonly used in malware to evade detection based on signature comparison. Common methods include:
 
 追加随机字节：将随机的字节序列附加到ELF文件的末尾。此操作不会影响文件的执行逻辑，但可能会改变文件的哈希值，使其避开传统的哈希匹配检测。
 
+Appending random bytes: Adding random byte sequences to the end of ELF files. This operation does not affect execution logic but may change file hashes, making the file evade traditional detection based on hash comparison.
+
 追加无害二进制文件内容：从已知的良性文件中提取节区或二进制内容，插入到恶意文件中，以增加文件的复杂度并扰乱静态分析工具的检测。
+
+Appending benign binary content: Inserting sections or binary content extracted from known benign files into malicious file increases complexity and disrupts static analysis tool detection.
 
 \begin{table}[htbp]
 	\centering
