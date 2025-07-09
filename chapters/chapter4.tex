@@ -460,8 +460,8 @@ Perturbation Cost: It measures the perturbation degree of modifications to the o
 
 Behavior Confusion Degree: It measures the similarity between sample behavior and benign software, encouraging the agent to generate more stealthy disturbance strategies.
 
-\subsection{奖励函数表达形式}
-
+\subsection{奖励函数表达形式 Reward Function Formulation}
+ 
 定义智能体在时刻 $t$ 执行扰动动作 $a_t$ 后的奖励 $R_t$ 为多项加权组合：
 
 The reward $R_t$ for the agent after executing disturbance action $a_t$ at time $t$ is defined as a weighted combination:
@@ -471,12 +471,13 @@ The reward $R_t$ for the agent after executing disturbance action $a_t$ at time 
 
 其中，$R_{\text{evasion}}$ 表示若样本成功绕过沙箱或分类器则给予正奖励，否则为 0；$R_{\text{confusion}}$ 表示根据行为序列（如系统调用图）与良性样本的相似度计算得分，例如使用 Jaccard 相似度或结构相似性；$R_{\text{cost}}$ 表示扰动的代价，可以根据扰动次数、修改字节数以及修改位置的敏感度等进行计算；$\lambda_1$、$\lambda_2$ 和 $\lambda_3$ 为动态可调的权重参数。
 
-In this formulation, $R_{\text{evasion}}$ represents that if the sample evade the sandbox or classifier, positive reward should be given, otherwise, the reward is zero; $R_{\text{confusion}}$ represents a score calculated from the similarity between behavioral sequence, such as system call graphs, and benign samples, such as using Jaccard similarity or structural similarity; $R_{\text{cost}}$ denotes the disturbance cost that is calculated based on number of disturbances, modified bytes, and sensitivity of modified locations; $\lambda_1$、$\lambda_2$ 和 $\lambda_3$ are dynamically adjustable weighting parameters.
+In this formulation, $R_{\text{evasion}}$ represents that if the sample evade the sandbox or classifier, positive reward should be given, otherwise, the reward is zero; $R_{\text{confusion}}$ represents a score calculated from the similarity between behavioral sequence, such as system call graphs, and benign samples, such as using Jaccard similarity or structural similarity; $R_{\text{cost}}$ denotes the disturbance cost that is calculated based on number of disturbances, modified bytes, and sensitivity of modified locations; $\lambda_1$, $\lambda_2$, and $\lambda_3$ are dynamically adjustable weighting parameters.
 
-\section{基于LSTM的PPO时序模型结构}
+\section{基于LSTM的PPO时序模型结构 PPO Sequential Model Structure Based on LSTM}
 
 本章提出的基于PPO（Proximal Policy Optimization）与 LSTM（Long Short-Term Memory）结合的强化学习模型主要由四个部分组成：LSTM时间特征编码层、策略网络（Actor）、价值网络（Critic）以及PPO优化器。训练过程中，首先由策略网络根据当前环境状态生成动作概率分布，同时价值网络对当前状态进行价值评估。为了能够有效建模动作序列中的时间依赖性，引入了LSTM模块，使得模型能够记忆过去的历史状态信息，捕获长期依赖特征，从而提升策略的稳定性与鲁棒性。最后，通过PPO优化器对策略进行迭代更新，保证训练过程中策略更新的稳定性与高效性。
 
+The reinforcement learning model combining PPO and LSTM, proposed in this chapter, consists of four main components: an LSTM temporal feature encoding layer, a policy network (Actor), a value network (Critic), and a PPO optimizer. During the training process, first, the policy network generates an action probability distribution based on the current environment state. Concurrently, the value network evaluates the value of the current state. To effectively model temporal dependencies in action sequences, the LSTM module is introduced, which enables the model to record historical state information and capture long-term dependency features, enhancing policy stability and robustness. Finally, the PPO optimizer iteratively updates the policy, ensuring stable and efficient policy updates throughout the training process.
 
 \begin{algorithm}[htbp]
 	\caption{基于强化学习的 ELF 对抗样本生成算法}
@@ -522,7 +523,9 @@ In this formulation, $R_{\text{evasion}}$ represents that if the sample evade th
 	}
 \end{algorithm}
 
-算法2描述了通过强化学习（PPO+LSTM）模型生成ELF格式恶意样本的免杀对抗样本。第1至2行初始化智能体和环境，加载预训练的PPO+LSTM模型。第3行初始化奖励信号$R_d$为0。第4至6行遍历原始恶意样本集S并重置环境，检测样本的标签。第7至9行提取环境中的特征，并存储在状态$S_t$中。第10至26行是主要的扰动步骤：智能体根据当前状态和奖励预测执行动作。第11至12行通过智能体的预测生成扰动动作，并根据样本标签（恶意或良性）决定是否继续执行。第13至15行，执行动作后更新样本并提取新的环境特征。第16至18行，计算新的奖励值，综合考虑规避性得分、行为混淆度和扰动成本。第19至24行根据检测结果和扰动成本动态计算奖励值，如果样本成功规避检测则给予较高的奖励，否则计算扰动成本并适当降低奖励。第27行更新样本的标签并记录在检测结果表Re中。整个流程通过多源奖励信号的融合与动态调整，逐步优化智能体的策略，以生成能够有效绕过检测并保持样本可执行性的对抗样本。
+算法2描述了通过强化学习（PPO+LSTM）模型生成ELF格式恶意样本的免杀对抗样本。第1至2行初始化智能体和环境，加载预训练的PPO+LSTM模型。第3行初始化奖励信号$R_d$为0。第4至6行遍历原始恶意样本集$S$并重置环境，检测样本的标签。第7至9行提取环境中的特征，并存储在状态$S_t$中。第10至26行是主要的扰动步骤：智能体根据当前状态和奖励预测执行动作。第11至12行通过智能体的预测生成扰动动作，并根据样本标签（恶意或良性）决定是否继续执行。第13至15行，执行动作后更新样本并提取新的环境特征。第16至18行，计算新的奖励值，综合考虑规避性得分、行为混淆度和扰动成本。第19至24行根据检测结果和扰动成本动态计算奖励值，如果样本成功规避检测则给予较高的奖励，否则计算扰动成本并适当降低奖励。第27行更新样本的标签并记录在检测结果表Re中。整个流程通过多源奖励信号的融合与动态调整，逐步优化智能体的策略，以生成能够有效绕过检测并保持样本可执行性的对抗样本。
+
+Algorithm 2 describes the ELF-format malware adversarial sample generation process that uses a reinforcement learning model based on PPO and LSTM. Lines 1 to 2 initialize the agent and environment, loading the pre-trained PPO+LSTM model. Line 3 initializes the reward signal $R_d$ to 0. Lines 4 to 6 iterate through the original malicious sample set $S$, reset the environment, and detect the sample's label. Lines 7 to 9 extract features from the environment and store them in state $S_t$. Lines 10 to 26 are the core disturbance steps: the agent predicts an action based on the current state and reward signal. Lines 11 to 12 generate disturbance actions based on the agent's prediction and decide whether to continue according to whether the sample's label is benign or malicious. After executing actions, lines 13 to 15 update samples and extract novel environmental characteristics. Line 16 to 18 calculate novel reward value comprehensively based on evasion score, behavior confusion degree, and disturbance cost. Line 19 to 24 dynamically calculates reward values according to the detection result and disturbance cost. If the sample evades detection successfully, higher rewards will be granted. Otherwise, the disturbance cost is calculated, and rewards are penalized. Line 27 updates the sample's label and records it in the result table Re. The whole process gradually optimizes the agent's strategies through merging multi-source signals and adjusting dynamically, generating adversarial samples that evade detection effectively while maintaining executability.
 
 \subsection{LSTM时间特征编码层}
 
