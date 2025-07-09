@@ -428,32 +428,50 @@ The disturbance method based on time delay is an effective dynamic adversarial t
 
 Algorithm 1 operates step-by-step, achieving inserting payload binary code into target ELF executable file's executable segment padding, maintaining original file structure while achieving control flow redirection. Lines 1 to 2 read target ELF file and payload into memory. Lines 3 to 4 check the legitimacy of ELF file, including magic number, whether it is 64 bits, and whether its architecture is x86-64. Lines 5 to 17 is the core process of injection, traversing each program header. Line 6 judges whether the segment is an executable segment that contains the PF\_X flag. Lines 7 to 8 locate the last section of this segment and calculate the gap size after it. Lines 9 to 10 terminate the process when the gap size cannot accommodate the payload and jump instructions. Lines 11 to 13 write the payload to the gap and append code block that jumps to the original entry point. Subsequently, lines 14 to 15 expand the size fields of the section and segment to cover newly injected areas to ensure that it can be loaded correctly during execution. Line 16 updates the entry point e\_entry in the ELF header to be the starting point of payload, achieving control flow redirection. Line 17 exits the loop to prevent duplicate operations after the injection is completed. Finally, lines 18 to 19 write the modified ELF file to an output file and set it as an executable file. The overall process achieves dynamic insertion operations that exhibit high concealment and complete compatibility in the condition that the original functionality is not broken.
 
-\section{动态奖励函数策略优化（DRFOS）}
+\section{动态奖励函数策略优化（DRFOS）Dynamic Reward Function Optimization Strategy (DRFOS)}
 
 传统对抗样本生成方法多采用固定或静态的奖励函数，往往仅考虑单一的检测规避结果，例如是否成功逃避分类器或沙箱分析系统\cite{anderson2018learning}。然而，在实际应用场景中，恶意样本的行为表征、检测机制、资源限制（如沙箱分析时长）等因素均具备高度动态性。因此，本文设计一种自适应、阶段感知和行为敏感的动态奖励函数策略，对于提升对抗样本生成质量和鲁棒性具有重要意义。
 
+Traditional adversarial sample generation methods mostly adopt fixed or static reward functions, often considering only a single evasion detection result, such as whether the sample successfully evades a classifier or a sandbox analysis system\cite{anderson2018learning}. However, in real application scenarios, factors such as malware behavioral characteristics, detection mechanisms, and resource constraints, such as sandbox analysis duration, exhibit high dynamism. Therefore, this research designs an adaptive, stage-aware, and behaviorally sensitive dynamic reward function strategy that is significant for improving the quality and robustness of adversarial sample generation.
+
 本文提出一种动态奖励函数优化策略，结合多个维度的行为表现动态调整奖励函数，以提升样本的逃避能力、生成效率与混淆性。
+
+This research proposes a dynamic reward function optimization strategy that dynamically adjusts the reward function based on multi-dimensional behavioral performance to enhance evasion capability, generation efficiency, and obfuscation of samples.
 
 在基于强化学习的对抗恶意样本生成框架中，奖励函数设计是智能体学习策略的核心驱动力。传统对抗样本生成方法多采用固定或静态的奖励函数，往往仅考虑单一的检测规避结果，例如是否成功逃避分类器或沙箱分析系统。然而，在实际应用场景中，恶意样本的行为表征、检测机制、资源限制（如沙箱分析时长）等因素均具备高度动态性。因此，设计一种自适应、阶段感知和行为敏感的动态奖励函数策略，对于提升对抗样本生成质量和鲁棒性具有重要意义。
 
-\subsection{奖励函数设计动机}
+In an adversarial malware sample generation framework based on RL, reward function design serves as the core driving force for agent policy learning. Traditional adversarial sample generation methods mostly adopt fixed or static reward functions, often considering only a single evasion detection result, such as whether the sample successfully evades a classifier or a sandbox analysis system. However, in real application scenarios, factors such as malware behavioral characteristics, detection mechanisms, and resource constraints, such as sandbox analysis duration, exhibit high dynamism. Therefore, designing a dynamic reward function strategy that is adaptive and behaviorally sensitive, and has high stage awareness, is crucial for improving the quality and robustness of adversarial sample generation.
+
+\subsection{奖励函数设计动机 Motivation for Reward Function Design}
 
 强化学习智能体的行为策略直接受其奖励信号驱动。若奖励仅依据“是否逃避成功”这一单一信号，则智能体可能在初始训练阶段陷入稀疏奖励困境，导致训练效率低下，策略不稳定，甚至难以收敛。为解决该问题，本方法引入多源奖励信号融合机制，综合以下三类指标：
 
+The behavioral policy of a reinforcement learning agent is directly driven by its reward signals. If rewards are solely based on the singular signal of "whether evasion is successful," the agent may face sparse reward dilemmas during initial training phases, resulting in inefficient training, unstable strategies, or even failure to converge. To address this issue, this research proposes a method that introduces a multi-source reward signal fusion mechanism, integrating the following three metrics:
+
 规避性得分（Evasion Score）：反映样本是否成功规避沙箱或机器学习检测模型，是核心奖励来源；
+
+Evasion Score: It reflects whether the sample successfully evades sandbox or machine learning detection models, serving as the primary reward source.
 
 扰动成本（Perturbation Cost）：衡量修改对原始样本的干扰程度，用于抑制过度修改，保持样本可执行性与语义一致性；
 
+Perturbation Cost: It measures the perturbation degree of modifications to the original sample, suppressing excessive alterations to maintain executability and semantic consistency.
+
 行为混淆度（Behavior Confusion Degree）：衡量样本行为与正常软件的相似度，鼓励智能体生成更具隐蔽性的扰动策略。
+
+Behavior Confusion Degree: It measures the similarity between sample behavior and benign software, encouraging the agent to generate more stealthy disturbance strategies.
 
 \subsection{奖励函数表达形式}
 
 定义智能体在时刻 $t$ 执行扰动动作 $a_t$ 后的奖励 $R_t$ 为多项加权组合：
+
+The reward $R_t$ for the agent after executing disturbance action $a_t$ at time $t$ is defined as a weighted combination:
 \begin{equation}
 	R_t = \lambda_1 \cdot R_{\text{evasion}} + \lambda_2 \cdot R_{\text{confusion}} - \lambda_3 \cdot R_{\text{cost}}
 \end{equation}
 
 其中，$R_{\text{evasion}}$ 表示若样本成功绕过沙箱或分类器则给予正奖励，否则为 0；$R_{\text{confusion}}$ 表示根据行为序列（如系统调用图）与良性样本的相似度计算得分，例如使用 Jaccard 相似度或结构相似性；$R_{\text{cost}}$ 表示扰动的代价，可以根据扰动次数、修改字节数以及修改位置的敏感度等进行计算；$\lambda_1$、$\lambda_2$ 和 $\lambda_3$ 为动态可调的权重参数。
+
+In this formulation, $R_{\text{evasion}}$ represents that if the sample evade the sandbox or classifier, positive reward should be given, otherwise, the reward is zero; $R_{\text{confusion}}$ represents a score calculated from the similarity between behavioral sequence, such as system call graphs, and benign samples, such as using Jaccard similarity or structural similarity; $R_{\text{cost}}$ denotes the disturbance cost that is calculated based on number of disturbances, modified bytes, and sensitivity of modified locations; $\lambda_1$、$\lambda_2$ 和 $\lambda_3$ are dynamically adjustable weighting parameters.
 
 \section{基于LSTM的PPO时序模型结构}
 
