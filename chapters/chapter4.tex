@@ -714,9 +714,11 @@ The ultimate overall loss function combining policy loss, value loss, and entrop
 Where \(S[\pi_{\theta}]\) is the policy entropy to encourage exploration. \(c_1\) and \(c_2\) are weighting coefficients.
 
 
-\section{本章小结}
+\section{本章小结 Chapter Summary}
 
 本章介绍了基于强化学习的恶意软件对抗样本生成技术，重点阐述了如何利用强化学习与多种扰动方法相结合，生成能够有效规避恶意软件检测模型的对抗样本。介绍了利用强化学习优化扰动策略的方式，使生成的恶意软件样本在保证隐蔽性的同时，能够有效规避多个检测模型的识别。接着介绍了本章所提出的奖励函数优化方案，以及详细介绍了提出的基于LSTM的PPO时序模型的具体实现。
+
+This chapter introduces adversarial malware sample generation techniques based on RL. It details how RL combines multiple disturbance methods to generate adversarial samples capable of evading malware detection models. The method for optimizing disturbance strategies via RL is explained, demonstrating how to generate malware samples that maintain concealment while evading detection by multiple models. Then this chapter presents the reward function optimization strategy and thoroughly describes the implementation of the PPO sequential model based on LSTM.
 
 
 
