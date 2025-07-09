@@ -527,40 +527,58 @@ The reinforcement learning model combining PPO and LSTM, proposed in this chapte
 
 Algorithm 2 describes the ELF-format malware adversarial sample generation process that uses a reinforcement learning model based on PPO and LSTM. Lines 1 to 2 initialize the agent and environment, loading the pre-trained PPO+LSTM model. Line 3 initializes the reward signal $R_d$ to 0. Lines 4 to 6 iterate through the original malicious sample set $S$, reset the environment, and detect the sample's label. Lines 7 to 9 extract features from the environment and store them in state $S_t$. Lines 10 to 26 are the core disturbance steps: the agent predicts an action based on the current state and reward signal. Lines 11 to 12 generate disturbance actions based on the agent's prediction and decide whether to continue according to whether the sample's label is benign or malicious. After executing actions, lines 13 to 15 update samples and extract novel environmental characteristics. Line 16 to 18 calculate novel reward value comprehensively based on evasion score, behavior confusion degree, and disturbance cost. Line 19 to 24 dynamically calculates reward values according to the detection result and disturbance cost. If the sample evades detection successfully, higher rewards will be granted. Otherwise, the disturbance cost is calculated, and rewards are penalized. Line 27 updates the sample's label and records it in the result table Re. The whole process gradually optimizes the agent's strategies through merging multi-source signals and adjusting dynamically, generating adversarial samples that evade detection effectively while maintaining executability.
 
-\subsection{LSTM时间特征编码层}
+\subsection{LSTM时间特征编码层 LSTM Temporal Feature Encoding Layer}
 
 在传统强化学习中，策略与价值估计往往只基于当前状态单步决策，忽略了历史决策之间的时间关联性，容易导致短视行为。
 
+In traditional RL, policy and value estimation usually rely solely on single-step decisions based on the current state, neglecting temporal correlations among historical decisions. This can lead to short-sighted behavior.
+
 为此，本模型在输入端引入了LSTM（长短期记忆网络），通过门控机制捕获长期依赖，增强决策的时序连贯性。
+
+To address this issue, the model introduces an LSTM layer at the input stage. Through gating mechanisms, LSTM captures long-term dependencies, enhancing the temporal coherence of decision-making.
 
 LSTM单元内部操作公式如下：
 
+Internal operation formulations of the LSTM unit are defined as follows:
+
 输入门（控制当前输入信息的流入）：
+
+Input Gate (controlling the flow of current input information):
 \begin{equation}
 i_t = \sigma(W_i x_t + U_i h_{t-1} + b_i)
 \end{equation}
 
 遗忘门（控制上一个记忆单元的保留程度）：
+
+Forget Gate (controlling retention level of the previous memory cell):
 \begin{equation}
 f_t = \sigma(W_f x_t + U_f h_{t-1} + b_f)
 \end{equation}
 
 单元状态更新（生成新的记忆内容）：
+
+Cell State Update (Generating new memory content):
 \begin{equation}
 \tilde{c}_t = \tanh(W_c x_t + U_c h_{t-1} + b_c)
 \end{equation}
 
 单元状态（记忆细胞）更新：
+
+Cell State Update (memory cell):
 \begin{equation}
 c_t = f_t \odot c_{t-1} + i_t \odot \tilde{c}_t
 \end{equation}
 
 输出门（控制隐藏状态输出）：
+
+Output Gate (controlling hidden state output):
 \begin{equation}
 o_t = \sigma(W_o x_t + U_o h_{t-1} + b_o)
 \end{equation}
 
 隐藏状态更新（作为下一步输出）：
+
+Hidden State Update (output for the next step):
 \begin{equation}
 h_t = o_t \odot \tanh(c_t)
 \end{equation}
@@ -568,86 +586,133 @@ h_t = o_t \odot \tanh(c_t)
 其中，$\sigma$ 为 Sigmoid 激活函数，$\odot$ 表示 Hadamard 乘积（元素乘），
 $x_t$ 是当前时刻的输入状态，$h_{t-1}$ 和 $c_{t-1}$ 分别是上一时刻的隐藏状态与单元状态。
 
+In the formulations, $\sigma$ is the Sigmoid activation function. $\odot$ represents the Hadamard product in element multiplication. $x_t$ is the input state of current time. $h_{t-1}$ and $c_{t-1}$ are the hidden state and cell state of the previous time step.
+
 通过以上机制，LSTM 能有效捕捉输入状态序列中的长期依赖特征，使策略网络与价值网络
 具有更强的历史建模能力。
 
-\subsection{策略网络（Actor）}
+This mechanism enables the LSTM to effectively capture long-term dependencies in input state sequences, enhancing the historical modeling capability of the policy and value networks.
+
+\subsection{策略网络（Actor） Policy Network (Actor)}
 
 策略网络负责从环境中接收到的状态信息中，输出当前动作的概率分布。为了增强策略对于历史信息的感知能力，策略网络在输入端接入了LSTM层，LSTM能够在一定程度上记忆先前状态的隐藏信息，从而使得输出的策略不仅依赖当前时刻的观测，还综合考虑了历史观测序列的特征。
-策略网络的目标是根据当前的隐藏状态 ，输出每个动作的概率分布 。
+策略网络的目标是根据当前的隐藏状态$h_{t}$，输出每个动作的概率分布$\pi_{\theta}(a_{t}|s_{t})$ 。
 具体过程如下：
+
+The policy network receives environmental state information and outputs the probability distribution of current actions. To enhance its awareness of historical information, the policy network introduces an LSTM layer at the input stage. The LSTM records hidden information from previous states, enabling the output policy to rely on not only the current observation but also features from historical observation sequences. The policy network's goal is to output each action's probability distribution $\pi_{\theta}(a_{t}|s_{t})$ based on the current hidden state $h_{t}$. The concrete processes are listed below:
 
 \begin{enumerate} [label=\arabic*)] 
 
-\item LSTM编码后的隐藏状态  作为输入;
+\item LSTM编码后的隐藏状态$h_{t}$作为输入;
+
+The LSTM-encoded hidden state $h_{t}$ serves as input.
 
 \item 经过多层感知机（MLP）映射至动作空间;
 
+A multilayer perceptron (MLP) maps this to the action space.
+
 \item 通过 Softmax 函数输出动作分布：
+
+The Softmax function outputs the action distribution:
 \begin{equation}
 \pi_{\theta}(a_t | s_t) = Softmax(W_p h_t + b_p)
 \tag{4.8}
 \end{equation}
 其中，$W_p$、$b_p$ 为策略网络的权重与偏置参数，$\theta$ 表示策略网络的参数集合;
 
+In this formulation, $W_p$ and $b_p$ are the policy network's weight and bias parameters, and $\theta$ represents the policy network's parameter set.
+
 \item 依据动作概率分布进行采样，生成动作 $a_t$：
+
+Actions $a_t$ are generated according to the sampling from the probability distribution.
 \begin{equation}
 a_t \sim \pi_\theta(a_t | s_t)
 \end{equation}
 
 \end{enumerate}
 
-\subsection{价值网络（Critic）}
+\subsection{价值网络（Critic） Value Network (Critic)}
 
 价值网络负责对当前状态的价值进行估计，即预测从当前状态出发，在未来遵循当前策略所能获得的期望回报。与策略网络类似，价值网络同样引入了LSTM编码层，以捕获状态序列中的时间关联性，提升价值估计的准确性和稳定性。
 
-价值网络旨在估计当前状态  的状态价值函数 ，即从状态  出发，在未来遵循当前策略  所能获得的期望总回报。与策略网络结构类似，价值网络也基于LSTM编码后的隐藏状态 ，经MLP输出一个实数值：
+The value network estimates the value of the current state and predicts the expected cumulative reward obtained by following the current policy starting from the current state. Like the policy network, the value network introduces an LSTM encoding layer to capture temporal correlations in state sequences, enhancing estimation accuracy and stability.
+
+价值网络旨在估计当前状态$s_{t}$的状态价值函数$V^{\pi}(s_{t})$，即从状态$s_{t}$出发，在未来遵循当前策略$\pi$所能获得的期望总回报。与策略网络结构类似，价值网络也基于LSTM编码后的隐藏状态$h_{t}$，经MLP输出一个实数值：
+
+The value network aims to estimate the state-value function $V^{\pi}(s_{t})$ in current state $s_{t}$, the expected total reward from state $s_t$ following current strategy $\pi$. Like the structure of strategy networks, value networks are also based on the LSTM-encoded hidden state $h_{t}$ and output a scalar value through MLP.
 
 状态价值估计：
+
+State value estimation:
 \begin{equation}
 V_{\phi}(s_t) = W_v h_t + b_v
 \end{equation}
 
 其中，$W_v$ 和 $b_v$ 分别为价值网络的权重与偏置参数，${\phi}$为价值网络参数集合。
 
-\subsection{策略优化器}
+In this formulation, $W_v$ and $b_v$ are the weight and bias parameters of the value network, and $\phi$ denotes its parameter set.
+
+\subsection{策略优化器 Policy Optimizer}
 
 PPO 引入了剪切（Clipped）目标函数，在更新策略时，限制新旧策略之间的变动范围，从而提高训练的稳定性。
 
+PPO introduces a clipped objective function that limits the divergence between old and new policies during updates, enhancing training stability.
+
 首先定义概率比率 \(r_t(\theta)\)：
+
+First,the probability ratio $r_t(\theta)$ is defined as:
 \begin{equation}
 	r_t(\theta) = \frac{\pi_{\theta}(a_t | s_t)}{\pi_{\theta_{\text{old}}}(a_t | s_t)} \tag{4.11}
 \end{equation}
 
 其中，\(\pi_{\theta_{\text{old}}}\) 表示上一次更新前的策略参数。
 
+$\pi_{\theta_{\text{old}}}$ represents the pre-update policy parameters.
+
 优势函数（Advantage）定义为：
+
+The advantage function $A_t$ is defined as:
 \begin{equation}
 	A_t = \delta_t = r_t + \gamma V(s_{t+1}) - V(s_t) \tag{4.12}
 \end{equation}
 
 其中，\(r_t\) 为即时奖励，\(\gamma\) 为折扣因子。
 
+$r_t$ is the immediate reward and $\gamma$ is the discount factor.
+
 PPO 的最终优化目标为：
+
+PPO's ultimate optimization target is:
 \begin{equation}
 	L^{\text{CLIP}}(\theta) = \mathbb{E}_t \left[ \min \left( r_t(\theta) A_t, \ \text{clip}\big(r_t(\theta), 1-\epsilon, 1+\epsilon\big) A_t \right) \right] \tag{4.13}
 \end{equation}
 
 当 \(r_t(\theta)\) 处于 \((1-\epsilon, 1+\epsilon)\) 区间内时，直接使用真实比率乘以优势函数；当超出该区间时，使用裁剪后的比率，防止策略更新幅度过大。
 
+When \(r_t(\theta)\) lies in the range \((1-\epsilon, 1+\epsilon)\), the true ratio multiplied by the advantage function is used. Outside this range, the clipped ratio is used to prevent excessive policy updates.
+
 价值函数损失（均方误差）为：
+
+The value function loss (squared error) is:
 \begin{equation}
 	L^{\text{VF}}(\varphi) = \mathbb{E}_t \left[ \left(V_{\varphi}(s_t) - R_t\right)^2 \right] \tag{4.14}
 \end{equation}
 
 其中，\(R_t\) 是累积回报（真实价值目标）。
 
+In this formulation, $R_t$ is the cumulative return (real value target).
+
 最终的整体损失函数（综合考虑策略损失、价值损失和熵正则化）为：
+
+The ultimate overall loss function combining policy loss, value loss, and entropy regularization is:
 \begin{equation}
 	L(\theta, \varphi) = L^{\text{CLIP}}(\theta) - c_1 L^{\text{VF}}(\varphi) + c_2 S[\pi_{\theta}] \tag{4.15}
 \end{equation}
 
 其中，\(S[\pi_{\theta}]\) 为策略熵，用以鼓励探索；\(c_1\) 和 \(c_2\) 为损失权重系数。
+
+Where \(S[\pi_{\theta}]\) is the policy entropy to encourage exploration. \(c_1\) and \(c_2\) are weighting coefficients.
+
 
 \section{本章小结}
 
