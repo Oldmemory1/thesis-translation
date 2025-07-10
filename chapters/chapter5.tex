@@ -17,15 +17,19 @@
 %
 % Compile with: xelatex -> biber -> xelatex -> xelatex
 
-\chapter{实验评估}
+\chapter{实验评估 Experimental Evaluation}
 
 本章将对基于强化学习的对抗性恶意样本生成方法进行评估。首先介绍实验的软硬件配置以及用到的评估指标。接下来，展示实验结果，并对模型中每个模块进行对比实验，以验证其可靠性。然后，将该模型与学术界类似任务的模型进行比较。
 
-\section{实验设置}
+This chapter evaluates the adversarial malware sample generation method based on RL. First, hardware and software configurations in this experiment and evaluation metrics are introduced. Second, the experimental results are presented, including comparative experiments for each module to verify its reliability. Finally, the proposed model is compared with other models addressing similar tasks in academia.
 
-\subsection{实验环境}
+\section{实验设置 Experiment Setting}
+
+\subsection{实验环境 Experiment Environment}
 
 本文的实验在一台配置为64位Linux操作系统的主机上进行，使用进行计算。本实验在强化学习环境下对恶意软件样本进行策略训练与对抗样本生成，实验平台采用基于 gym-malware 的自定义环境，模拟真实软件行为特征。为了提高训练效率与灵活性，本实验混合使用了 ChainerRL 和 PyTorch 框架。在模型构建方面，使用了 ChainerRL 中的 ACER 和 PPO 算法模块，对 agent 的策略网络与价值网络进行联合优化。环境中使用的样本来由 gym-malware 的接口封装提供动作空间和状态转换功能。为了增强样本多样性，训练过程中使用 EpisodicReplayBuffer 存储历史交互轨迹，并引入时间步奖励衰减机制，具体实验环境如表\ref{tab:5.1}所示。
+
+Experiments in this research were conducted on a host configured with a 64-bit Linux operating system. RL environments were used to train malware samples and generate adversarial samples. The experimental platform utilized a custom environment based on gym-malware to simulate real software behavioral characteristics. To enhance training efficiency and flexibility, the ChainerRL and PyTorch frameworks were jointly employed. For model construction, the ACER and PPO algorithm modules from ChainerRL were used to jointly optimize the agent's policy and value networks. Sample interactions in the environment were managed via gym-malware's interface, which encapsulates action spaces and state transition functionality. To increase sample diversity, the training process uses the EpisodicReplayBuffer to store historical interaction trajectories and introduces a time-step reward decay mechanism. Detailed experimental environment specifications are shown in Table \ref{tab:5.1}.  
 
 \begin{table}[htbp]
 	\centering
@@ -46,23 +50,39 @@
 	\end{tabular*}
 \end{table}
 
-\subsection{数据集构建}
+\subsection{数据集构建 Dataset Construction}
 
 在使用指令替换作为扰动方法时，由于不同处理器架构所使用的指令集存在差异，因此在构建数据集时必须确保所有样本来自同一处理器架构。当前 Linux 平台的恶意软件主要针对 ARM、x86-64、MIPS 等常见架构，其中 x86-64 是最广泛使用的目标平台。考虑到本研究的指令替换环境是基于x86架构指令集的，故本文统一选择 x86-64 架构的 Linux ELF 文件作为研究对象。其中，恶意样本来源于 VirusShare 网站，良性样本则提取自本实验所使用的 Ubuntu 系统。
 
+When employing instruction substitution as a disturbance method, all samples should originate from the same architecture because instruction sets used by different processor architectures have differences. Current Linux malware primarily targets common architectures, such as ARM, x86-64, and MIPS, with the condition that x86-64 has been the most widely adopted platform. Given that this research's instruction substitution environment is based on the x86 instruction set, all Linux ELF files selected for analysis are of the x86-64 architecture. Malicious samples were sourced from the VirusShare website, while benign samples were extracted from the Ubuntu system used in this experiment.
+
 本节系统介绍了本研究所使用的数据集构建过程。在当前缺乏公开标准 Linux ELF 恶意/良性软件数据集的背景下，本文采用“自主收集 + 多重筛选”的方式构建了一个规模适中、质量较高的专用数据集。具体而言，首先从 VirusShare 平台中收集了 43,553 个原始恶意 ELF 样本，并经过架构筛选和 objdump 反汇编能力检测，最终保留13,845 个结构完整的 x86架构的恶意样本。
+
+This section details the dataset construction process. In the absence of publicly available standard Linux ELF malware and benign software datasets, this research constructs a moderate-scale, high-quality dedicated dataset by using self-collection and multi-step sifting methods. Specifically, 43,553 raw malicious ELF samples were collected from VirusShare. After sifting by architecture and objdump disassembly capability testing, 13,845 structurally intact x86 malicious samples were retained.
 
 良性样本部分，本研究从实际 Ubuntu 系统环境中提取 /bin、/usr/bin 等路径下的 ELF 可执行文件，经过格式验证和架构确认，获得 2,141个良性 ELF 样本。这些样本代表了正常的系统运行和用户操作，确保了良性与恶意样本在后续训练中的平衡性，并为模型提供了丰富的正常行为数据。
 
+For benign samples, ELF executables from paths such as /bin and /usr/bin were extracted from an actual Ubuntu environment. Format verification and architecture confirmation selected 2,141 benign ELF samples. These represent normal system operations and user activities, ensuring the balance between benign and malicious samples during training and providing abundant behavioral data.
+
 为了保证实验结果的可靠性，本文对所选样本的标签进行了二次验证。具体来说，首先使用Virustotal平台对每个恶意软件样本进行扫描和分析。Virustotal通过多种杀毒引擎和分析工具对上传的文件进行检测，并提供详细的检测报告。基于这些报告，本文可以查看每个样本被各个反病毒引擎标记为恶意软件的情况，以及它们在不同引擎中的检测结果。
+
+To ensure the result reliability, sample labels were conducted the secondary verification. In concrete, first, each malware sample was scanned and analyzed by the VirusTotal platform. VirusTotal scanned the uploaded file using multiple antivirus engines and analysis tools and provided detailed scanning reports. Based on these reports, this research could check the circumstances that each sample was marked as malware by each antivirus engine and the detection results in different engines.
 
 在二次验证过程中，首先检查每个样本在Virustotal平台上的检测结果是否与本文原始收集的标签一致。本文只保留被大于5个反病毒引擎报告为恶意的样本，如果某个样本的检测结果全为良性，本文才保留它作为良性样本，其余的不确定样本都将被剔除。此外，Virustotal还提供了“first-seen”字段，记录了恶意软件样本首次被检测到的时间，结合该字段，本文能够进一步确认样本的来源和是否属于已知的恶意软件家族。
 
+In the secondary verification process, each sample was checked to see whether the detection result from the VirusTotal platform was the same as original labels collected by this research. This research only retained samples that are reported as malware by more than five antivirus engines as malicious samples. If a sample's detection results were all benign, this research retained it as benign samples. Otherwise, VirusTotal offers the “first-seen” field to record when the malicious sample was first detected. Combining this field, this research can further ensure the sample's source and identify whether it belongs to any known malware families.
+
 在构建数据集过程中，除了收集和筛选恶意与良性 ELF 样本外，本文还利用 LIEF 工具从良性样本中提取了扰动的字节，包括字符串数据等。这一过程对于后续对抗样本的生成至关重要。
+
+During the dataset construction process, besides collecting and sifting malicious and benign ELF samples, this research also used LIEF tools to extract bytes for perturbation, such as string data, from benign samples. This process is vital for subsequent adversarial sample generation.
 
 为了确保扰动字节的多样性和有效性，本文从良性样本中提取了不同类型的数据，包括程序的常量字符串、符号信息及其相关的内存布局。通过修改这些字节，生成的对抗样本不仅能够在字节层面改变文件的内容，还能在功能上对检测模型产生干扰。这些经过扰动处理的字节经过 LIEF 工具的再次封装，确保它们仍然符合 ELF 文件的格式要求，避免破坏文件的整体结构，保证生成的对抗样本在有效性和可执行性之间保持平衡。此部分操作为构建一个高效且可靠的对抗训练模型提供了坚实的数据支持。
 
+To ensure the diversity and validity of bytes for perturbation, this research extracted different types of data from benign samples, such as program constant strings, symbol information, and related memory layouts. By modifying these bytes, generated adversarial samples can not only alter the file's content at byte level but also disturb  detection models in functionality realm. These disturbed bytes re-encapsulated by LIEF tools ensured that they still fit ELF file format requirements, avoiding disruption of overall file structures, maintaining the balance between validity and executability. These operations provided solid data support for constructing an effective and reliable adversarial training model.
+
 经过标签验证、时间戳的信息获取，本文最终构建了实验所用的数据集，如表\ref{tab:5.2}所示，该数据集将用于后续章节中的特征建模、状态空间构造、动作空间设计与策略训练等关键任务，并为本研究探索基于强化学习的恶意样本对抗生成技术奠定了坚实的基础。
+
+Through label verification and timestamp validation, this research constructed the experimental dataset, which is listed in Table \ref{tab:5.2}. It will facilitate crucial tasks such as feature modeling, state space construction, action space design, and policy training, constructing a solid foundation for exploring adversarial malware generation methods based on RL.  
 
 \begin{table}[htbp]
 	\centering
@@ -78,12 +98,15 @@
 	\end{tabular*}
 \end{table}
 
-\subsection{特征处理方式}
+\subsection{特征处理方式 Feature Processing Approach}
 
 在恶意软件检测任务中，特征提取是一项关键的前置工作，它能够在不执行程序的前提下，从可执行文件的结构和内容中挖掘具有判别力的信息。本项目面向ELF（Executable and Linkable Format）格式的Linux恶意样本，因为数据集的特殊性，本文基于LIEF（Library to Instrument Executable Formats）库构建了一个可扩展的静态特征提取模块，融合了多种维度的特征，用于后续的机器学习与强化学习模型训练。
 
+In malware detection tasks, feature extraction is a critical preprocessing step that enables extracting discriminative information from executable files' structures and contents without executing the program. Targeting Linux malicious samples in ELF, this project constructed an extensible static feature extraction module based on the LIEF library due to the dataset’s specificity. This module integrates multi-dimensional features for subsequent machine learning and RL model training.
+
 该模块采用面向对象的结构设计，核心思想是为每种特征类型设计一个独立的类，实现特征提取的解耦与模块化。每个特征类负责从原始ELF样本中提取特定的信息，输出为结构化的特征向量或统计指标。最终，所有特征被组合为一个统一的特征向量，供模型使用。该方法具有通用性强、计算效率高、不依赖动态执行环境等优点，适用于大规模样本处理与对抗样本生成任务，具体特征类型如表\ref{tab:5.3}所示。
 
+This module adopts an object-oriented structure design. Its core idea is designing an independent class for each feature type to achieve decoupling and modularization for feature extraction. Each feature class is responsible for extracting specific information from original ELF samples and outputting structured feature vectors or statistical metrics. Ultimately, all features combine into a unified feature vector for model usage. This method exhibits advantages, including high generalizability, computational efficiency, and independence from dynamic execution environments, making it suitable for large-scale sample processing and adversarial sample generation tasks. Specific feature types are listed in Table \ref{tab:5.3}.  
 
 \begin{table}[htbp]
 	\centering
@@ -108,9 +131,11 @@
 
 
 
-\subsection{检测器训练与评估}
+\subsection{检测器训练与评估  Detector Training and Evaluation}
 
 本章基于表\ref{tab:5.2} 所示的训练集和表\ref{tab:5.3} 所示的特征提取方式，训练基于随机森林（Random Forest, RF）和SVM的 Linux ELF 恶意软件检测器，并利用测试集对这些检测器进行了评估。为了全面衡量模型性能，本研究采用四种常见的机器学习评价指标：精确率（Precision）、准确率（Accuracy）、召回率（Recall）以及 F1 分数（F1-score）。这些评价指标的计算公式如公式（5.1）至（5.4）所示：
+
+Using the training set illustrated in Table 5-2 and the feature extraction methods presented in Table 5-3, this chapter trains Linux ELF malware detectors based on Random Forest (RF) and SVM and evaluates these detectors using the test set. To comprehensively assess model performance, this research adopts four common machine learning evaluation metrics, including precision, accuracy, recall, and F1-score. The calculation formulations for these metrics are shown in equations (5.1) to (5.4):
 \begin{equation}
 	\text{Precision} = \frac{TP}{TP + FP}
 	\tag{5.1}
@@ -132,6 +157,8 @@
 却被错误分类为恶意的样本数量；TN 表示真实为良性且被正确分类为良性的样本数
 量；FN 表示真实为恶意却被误分类为良性的样本数量。
 
+In the formulations, TP denotes the number of samples correctly identified as malicious. FP represents the number of benign samples incorrectly classified as malicious. TN denotes the number of benign samples correctly classified as benign. FN represents the number of malicious samples incorrectly classified as benign.
+
 基于上述指标，本文对随机森林和 SVM 检测器在测试集上的性能进行了评估，
 评估结果如表\ref{tab:5.4}所示。实验结果表明，基于随机森林的检测器和 SVM 均取得了较
 高的检测性能，四项评价指标普遍超过 96\%。随机森林（RF）在四项性能指标中均
@@ -143,6 +170,8 @@
 型在处理复杂的高维特征数据时具有更强的鲁棒性和泛化能力，能够更有效地识别恶
 意样本。因此，在本研究的数据集和特征设置下，随机森林更适合作为主要的检测模
 型。
+
+Based on these metrics, this research evaluates the performance of RF and SVM detectors on the test set. The results are presented in Table \ref{tab:5.4}. The results indicate that both RF and SVM achieved high detection performance, with all four metrics exceeding 96\%. RF precedes SVM across all metrics, particularly in accuracy and recall. RF achieved 99.0\% accuracy, 99.0\% precision, 97.0\% recall, and 98.0\% F1-score. This indicates strong false-negative control while maintaining a low false-positive rate. In comparison, SVM showed robust but slightly inferior result: 97.0\% accuracy, 96.0\% precision, 96.5\% recall, and 97.5\% F1-score, which demonstrates that SVM is inferior to RF in some sample classifications. These results indicate that the RF model exhibits stronger robustness and generalization capabilities when processing complex high-dimensional feature data, enabling more effective malware identification. Therefore, with the dataset and feature configuration of this research, Random Forest is more suitable as the primary detection model.
 
 \begin{table}[htbp]
 	\centering
@@ -159,59 +188,87 @@
 	\end{tabular*}
 \end{table}
 
-\subsection{实验评估指标}
+\subsection{实验评估指标 Experimental Evaluation Metrics}
 
 为了全面评估基于强化学习的对抗样本生成方法的有效性与实用性，本文选取了以下五个核心指标进行分析：攻击成功率、扰动幅度、收敛速度、迁移攻击成功率与平均生成时间。这些指标能够从攻击效果、扰动隐蔽性、训练效率、策略泛化能力以及资源消耗等多个维度对方法进行定量评估。
+
+To comprehensively evaluate the effectiveness and practicality of the adversarial sample generation method based on RL, this study employs the following five core metrics: attack success rate, perturbation count, convergence speed, transfer attack success rate, and average generation time. These metrics enable quantitative assessment across multiple dimensions, including attack efficacy, perturbation concealment, training efficiency, policy generalization capability, and resource consumption.
 
 \begin{enumerate}[label=\arabic*)]
 	\item 攻击成功率（Attack Success Rate, ASR） \\
 	攻击成功率用于衡量生成的对抗样本是否能够成功欺骗目标检测模型，是最核心的评估指标之一。其定义如下：
+
+    ASR measures whether the adversarial samples successfully deceive the target detection model and is one of the most critical evaluation metrics. Its definition is:
 	\begin{equation}
 		\text{ASR} = \frac{N_{\text{success}}}{N_{\text{total}}}
 		\tag{5.5}
 	\end{equation}
 	其中，$N_{\text{success}}$ 表示攻击成功的样本数量，$N_{\text{total}}$ 表示总共生成的对抗样本数量。ASR 越高，说明强化学习智能体生成的策略越有效，攻击能力越强。
+
+    In this formulation, $N_{\text{success}}$ denotes the count of samples achieving successful attacks, and $N_{\text{total}}$ presents the total number of adversarial samples generated. A higher ASR indicates greater effectiveness and stronger attack capability of the strategies generated by RL agent.
 	
 	\item 扰动次数（Perturbation Count） \\
 	扰动次数用于衡量生成对抗样本过程中所进行的特征修改的次数。扰动次数越多，代表对抗样本与原始样本的差异越大。该指标有助于评估对抗样本的“隐蔽性”与“攻击强度”。定义为每个对抗样本在生成过程中所使用的扰动动作数量，扰动次数越少，表示对抗样本越隐蔽，攻击的有效性越强。
+
+    Perturbation count measures the number of feature modifications applied during adversarial sample generation. Higher perturbation counts imply greater deviations between adversarial and original samples. This metric helps evaluate the concealment and attack intensity of adversarial samples. It is defined as the number of perturbation actions used per adversarial sample during the adversarial sample generation process. Fewer perturbations indicate higher concealment and stronger attack validity.
 	
 	\item 收敛速度（Convergence Speed）\\
 	收敛速度用于衡量智能体在训练过程中达到预期性能水平（如攻击成功率超过某一阈值）所需的训练步数或时间。其定义如下：
+
+    Convergence Speed measures the training steps or time required for the agent to reach a predefined performance level, such as ASR exceeds a threshold during training. Its definition is:
 	\begin{equation}
 		S_{\text{converge}} = \min\{t \mid \text{ASR}_t \geq \tau\}
 		\tag{5.6}
 	\end{equation}
 	其中，$\text{ASR}_t$ 表示第 $t$ 步时的攻击成功率，$\tau$ 为设定的阈值（如 90\%）。收敛速度越快，说明训练过程越高效，可节省计算资源和实验时间。
+
+    In this formulation, $\text{ASR}_t$ denotes the attack success rate at step $t$, and $\tau$ represents the preset threshold such as 90\%. Faster convergence indicates higher training efficiency and reduces computational resource consumption and training time.
 	
 	\item 迁移攻击成功率（Transfer Attack Success Rate, TASR）\\
 	迁移攻击成功率用于衡量训练完成的对抗策略是否具有较好的泛化能力，即能否成功攻击其他未见过的目标模型。定义如下：
+
+    TASR measures the generalization capability of the trained adversarial strategy that whether it can successfully attack other unseen target models or platforms. Its definition is:
 	\begin{equation}
 		\text{TASR} = \frac{N_{\text{transfer\_success}}}{N_{\text{transfer\_total}}}
 		\tag{5.7}
 	\end{equation}
 	其中，$N_{\text{transfer\_success}}$ 表示在新模型或平台上攻击成功的样本数量，$N_{\text{transfer\_total}}$ 为参与迁移测试的样本总数。TASR 越高，表明策略具备更好的泛化能力。
+
+    In this formulation, $N_{\text{transfer\_success}}$ denotes the count of samples successfully attacking new models or platforms, and $N_{\text{transfer\_total}}$ represents the total number of samples tested for transferability. Higher TASR indicates stronger generalization capability.
 	
 	\item 平均生成时间（Average Generation Time）\\
 	平均生成时间反映了每个对抗样本从生成到验证所需的时间，代表方法的实际可用性。其定义如下：
+
+    Average Generation Time reflects the time required to generate and verify each adversarial sample, representing the method's practical usability. Its definition is:
 	\begin{equation}
 		T_{\text{avg}} = \frac{1}{N} \sum_{i=1}^{N} T_i
 		\tag{5.8}
 	\end{equation}
 	其中，$T_i$ 表示第 $i$ 个样本的生成时间，$N$ 为总样本数量。生成时间越短，说明该方法更适合实际部署或大规模生成场景。
+
+    In this formulation, $T_i$ denotes the generation time for Sample $i$, and $N$ represents the total sample count. Shorter generation times indicate greater suitability for practical deployment or large-scale generation scenarios.
 \end{enumerate}
 
-\section{恶意软件对抗性生成模型表现}
+\section{恶意软件对抗性生成模型表现 Performance of Adversarial Malware Generation Model}
 
 在本实验中，训练和测试样本的选择过程是基于Virustotal报告中的“first-seen”字段进行排序的。该字段记录了每个恶意软件样本第一次被Virustotal平台发现的时间，代表了该样本首次出现的日期和时间。通过利用这一时间戳，能够对样本进行时间上的排序，从而模拟恶意软件的进化过程。
 
+In this experiment, the selection process of training and testing samples was sorted based on the "first-seen" field from VirusTotal reports. This field records the date and time when each malware sample was first scanned by the VirusTotal platform, representing its initial appearance. Utilizing these timestamps allows that malware revolution can be simulated by sorting samples in time ordering.
+
 具体来说，本文首先从Virustotal平台获取了大量恶意软件样本的检测报告，并依据“first-seen”字段对这些样本进行了升序排序。检测模型和对抗样本生成模型使用不同的数据，检测模型使用位于时间序列前端的数据训练，对抗样本生成模型则使用位于后端的数据。这一排序策略的优势在于，它能够帮助本文训练模型识别早期和新兴的恶意软件样本，进而提升模型在面对新型、未被广泛识别的恶意软件时的适应能力。通过选择“first-seen”较早的样本作为训练集，能够确保模型能够处理那些相对较早出现的恶意软件，并从这些样本中学习到潜在的攻击模式。
 
+Specifically, this research gathered numerous malware sample detection reports and sorted them in ascending order according to the "first-seen" field. The detection model and adversarial sample generation model utilize different datasets. The detection model used data situated at the front of time sequence for training while the adversarial sample generation model used data located at the end of time sequence. This sorting strategy exhibits advantages in promoting the training model in this research to identify historical and newly emerging malware samples, thus enhancing the model's adaptivity for novel malware that are not detected widely. Selecting earlier "first-seen" samples ensures that models can address malware that earlier presented, learning potential attack approaches from these samples.
+
 在测试集的选择上，本文同样使用了“first-seen”字段对样本进行排序，确保测试集包含来自不同时间段的恶意软件样本。这种方法使得模型不仅能够评估其在新样本上的表现，还能够检测其在历史样本上的有效性。通过这种方式，研究者能够全面地考察模型在多种恶意软件类型和攻击模式下的泛化能力。
+
+For test set selections, this research also utilizes the "first-seen" field to sort samples to ensure that test dataset includes malware from diverse time periods. This method stimulates models not only to evaluate their performance on different novel samples but also to examine the validity of historical samples. Researchers can comprehensively examine generalization capabilities across multiple malware types and attack patterns.
 
 \subsection{参数选择}
 
 在本实验中，本文对强化学习模型的参数进行了精心设置，以确保训练过程的有效性和稳定性。以下是关键参数的设置和说明：
 首先，训练的步骤数（rounds）设定为5000至10000步，目的是确保智能体通过足够的交互时间学到有效的策略。每个步骤代表智能体与环境的一次交互，智能体根据当前的策略选择动作并根据奖励更新其策略。训练的过程中，本文使用了两种不同的环境：malware-v0和malware-score-v0。malware-v0是一个没有评分机制的环境，而malware-score-v0则包含了评分系统，用于模拟黑盒攻击和白盒攻击两个环境，常见具体的参数如表\ref{tab:5.5}所示。
+
+In this experiment, the parameters of RL model were meticulously configured to ensure effective and stable training. Critical parameter settings and descriptions are introduced as follows: The number of training rounds was set between 5,000 and 10,000 to ensure sufficient interaction time for the agent to learn effective strategies. Each step represents an interaction between the agent and the environment. The agent selects an action based on its current policy and updates the policy according to the reward. During training, two distinct environments were used: malware-v0 and malware-score-v0. malware-v0 is an environment lacking a scoring mechanism, while malware-score-v0 incorporates a scoring system to simulate black-box and white-box attack environments. Common specific parameters are listed in Table \ref{tab:5.5}.
 
 \begin{table}[htbp]
 	\centering
@@ -234,9 +291,15 @@
 
 在模型架构方面，PPO模型使用了带LSTM（长短期记忆）层的架构，以便于处理带有时间相关性的任务。模型的输入是来自环境的状态信息，经过全连接层后输入到LSTM层，LSTM层帮助智能体记住长期的信息，并且输出动作的概率分布（pi）和状态价值估计（v）。该模型的隐藏层大小为128，LSTM层的输出维度与隐藏层大小相同。
 
+In the model architecture aspect, the PPO model employed a structure with LSTM layers to handle temporally correlated tasks. The model input consists of state information from the environment, processed through a fully connected layer before entering the LSTM layer. The LSTM layer enables the agent to retain long-term information and outputs a probability distribution pi of actions and the state value estimate v. The hidden layer size of this model is 128, which is equivalent to the output dimension of the LSTM layer.
+
 确认好超参数，将LSTM层数分别设置为1、2、3、4，训练10个epoch，记录每组模型在同一检测器下的平均逃逸率、标准差（衡量模型稳定性）和平均训练步数。实验使用1500个恶意样本作为训练集，训练目标是通过最小化被检测器发现的概率生成对抗样本，实验结果如表\ref{tab:5.6}所示。
 
+After confirming the hyperparameters, the number of LSTM layers was set to 1, 2, 3, and 4, respectively. Each configuration was trained for 10 epochs, with the average evasion rate, standard deviation that indicates model stability, and average training steps recorded by the same detector. The experiment utilized 1500 malicious samples as the training set, with the target of generating adversarial samples by minimizing their detection probability. Experimental results are presented in Table \ref{tab:5.6}.  
+
 从实验结果可见，随着LSTM层数的增加，模型的表达能力逐渐增强，在一定程度上有助于提升逃逸率。从表\ref{tab:5.6}可以看出，随着 LSTM 层数从1层增加到3层，平均逃逸率从85.4\%上升到89.1\%，平均扰动数也从 3.1 次增至 4.2 次，说明更深的时序模型能够捕捉更丰富的策略特征，提高对抗样本的生成效果。与此同时，收敛速度在 2 层时达到最快（4500步），而在 3 层和 4 层时分别回升至4600步和5200步，表现出过深网络带来的训练效率下降。
+
+From the experimental results, it is evident that as the number of LSTM layers increases, the model's representational capacity gradually strengthens, which contributes to improving the evasion rate to a certain extent. As shown in Table \ref{tab:5.6}, when the number of LSTM layers increases from 1 to 3, the average evasion rate rises from 85.4\% to 89.1\%, and the average number of perturbations increases from 3.1 to 4.2, demonstrating that deeper temporal models capture more abundant strategic features, enhancing adversarial sample generation efficiency. Meanwhile, convergence speed is fastest at 2 layers (4500 steps) but increases to 4600 and 5200 steps at 3 and 4 layers, respectively, indicating reduced training efficiency due to excessive network depth.
 
 \begin{table}[htbp]
 	\centering
@@ -256,12 +319,20 @@
 
 综合来看，2层LSTM不仅实现了较高的逃逸率（88.7\%）和适中的扰动成本（3.8 次），还在收敛速度上表现最优，因此在攻击效果和训练效率之间取得了最佳平衡。基于此，本文最终采用2层LSTM作为策略网络的核心结构，用于高效生成对抗样本。
 
+Overall, the 2-layer LSTM achieves a high evasion rate (88.7\%) and moderate perturbation cost (3.8 times) while exhibiting optimal convergence speed. This configuration strikes the best balance between attack effectiveness and training efficiency. Based on this result, this study adopts the 2-layer LSTM as the core architecture of the policy network for efficient adversarial sample generation.
+
 确认好 LSTM 层数后，隐藏层的大小对模型的对抗样本生成性能也有显著影响。实验分别设置了隐藏层大小为 64、128、256、512，并在相同条件下对比了攻击成功率、平均扰动数和收敛速度等指标，结果如表\ref{tab:5.7} 所示。随着隐藏层规模从 64 增大到 256，攻击成功率从 85.4\% 提升至 89.1\%，平均扰动数也由 2.9 次增加到 4.1 次，说明更大的隐藏层能够捕捉更丰富的特征信息，从而提高对抗样本的生成效果。但当隐藏层大小进一步增至512时，攻击成功率出现回落（87.5\%），且收敛速度由最佳的4500步增至5200步，表明过大的网络容量容易导致训练效率下降。
+
+After confirming the LSTM layer count, the hidden layer size significantly affects adversarial sample generation performance. Experiments compared hidden layer sizes of 64, 128, 256, and 512 under the same conditions, evaluating attack success rate, average perturbation frequency, and convergence speed. The results are shown in Table 5-7. As the hidden layer size increased from 64 to 256, attack success rate improved from 85.4\% to 89.1\%, and average perturbation times rose from 2.9 to 4.1, indicating that larger hidden layers capture more abundant feature information to enhance adversarial sample quality. However, when the size increased to 512, attack success rate dropped to 87.5\%, and convergence slowed from the optimal 4500 steps to 5200 steps, confirming that excessive network capacity reduces training efficiency.
 
 综合来看，隐藏层大小为 128 时，模型在攻击成功率（88.7\%）、平均扰动数（3.8次）以及 收敛速度（4500步）三个指标上均取得了最佳平衡，既保证了较高的逃逸效果，又保持了较快的训练收敛。因此，结合前述 LSTM 层数的选择，本文最终采用由两层 LSTM 组成、每层隐藏单元数为 128 的网络结构，作为对抗样本生成策略的核心模型。
 
+In summary, when the hidden layer size is 128, the model achieves optimal balance among the success rate of 88.7\% , average perturbations of 3.8 times, and convergence speed of 4,500 steps, not only maintaining high evasion effectiveness but also converging rapidly during training. Therefore, combining the LSTM layer selection discussed before, this research ultimately adopts a network structure constituted by 2 LSTM layers that each contains 
+128 hidden units as core adversarial sample generation model.
+
 训练过程中的另一个重要超参数是“标准化优势函数”，这项设置有助于减少由于优势函数估计不准带来的训练不稳定。熵正则化系数（entropy\_coef=0.01）也被设置为0.01，以鼓励策略的多样性，避免智能体过早地陷入局部最优解。
 
+Another critical hyperparameter during training is the standardized advantage function, which helps reduce training instability caused by inaccurate advantage function estimation. The entropy regularization coefficient (entropy\_coef) was set to 0.01 to encourage policy diversity and prevent premature convergence to local optima.
 
 \begin{table}[htbp]
 	\centering
@@ -280,6 +351,8 @@
 \end{table}
 
 为了选取为了适应训练过程中的策略演化与环境变化，本方法引入奖励权重的自适应调整机制，为了确定动态奖励函数的权重选择，本文设计不同的权重值对比实验，从样本中选取100个样本进行逃逸训练的随机森林模型，实验结果如表\ref{tab:5.8}所示。
+
+To adapt to strategy evolution and environmental changes during the training process, this research introduces an adaptive adjustment mechanism for reward weights. To determine weight selections for the dynamic reward function, this research designs comparison experiments with different weight values. A random forest model was trained using 100 samples for evasion testing, with results presented in Table \ref{tab:5.8}.
 
 \renewcommand{\arraystretch}{1.3}
 \begin{table}[htbp]
@@ -302,19 +375,30 @@
 
 根据实验数据，设定参数分为三个时期，训练阶段如下：
 
+Based on experimental data, parameters are divided into three phases and listed as follow:
+
 探索期（Exploration Phase）：前期以提升规避能力为目标，权重配置为：$\lambda_1= 0.75, \lambda_2 = 0.2, \lambda_3=0.05$
 
+Exploration Phase: Initial stage focused on improving evasion capability:$\lambda_1= 0.75, \lambda_2 = 0.2, \lambda_3=0.05$
 
 收敛期（Exploitation Phase）：中期鼓励智能体学习生成稳定有效的低代价策略：
+
+Exploitation Phase: encouraging agent generating stable efficient low-cost strategies in the middle stage :
 $\lambda_1= 0.6, \lambda_2 = 0.3, \lambda_3=0.1$
 
-混淆优化期（Confusion Enhancement Phase）：后期强化行为混淆性，提高对抗能力隐蔽性：$\lambda_1= 0.4, \lambda_2 = 0.4, \lambda_3=0.2$
+混淆优化期（Confusion Enhancement Phase）：后期强化行为混淆性，提高对抗能力隐蔽性：
+Confusion Enhancement Phase:  strengthening behavioral confusion to improve concealment in the final stage:
+$\lambda_1= 0.4, \lambda_2 = 0.4, \lambda_3=0.2$
 
 \subsection{总体表现}
 
 确认好模型训练相关的参数之后，本文使用自己所创建的数据集从中选取1000个样本进行实验，训练过程如图所示。为了体现对比度，在本实验中，本文对比了两种强化学习算法，分别是PPO（Proximal Policy Optimization）和ACER\cite{wang2016sample}（Actor-Critic with Experience Replay），以评估它们在恶意软件对抗生成中的表现。PPO作为一种基于策略梯度的方法，强调通过调整策略的更新幅度来保证训练的稳定性。而ACER则结合了策略优化和经验回放的优势，通过信任域优化（Trust Region Optimization）来提高策略的稳定性，同时在训练过程中使用了重放缓冲区来加强对经验的学习。
 
+After setting model training parameters, this research conducts experiments using 1,000 samples from the self-constructed dataset. The training process is shown in the figure. To embody the contrast, this research compares the PPO(Proximal Policy Optimization) algorithm and the ACER(Actor-Critic with Experience Replay)\cite{wang2016sample} algorithm to assess their performance in the adversarial sample generation process. As a method based on policy gradient, PPO emphasizes keeping training stable through adjusting strategy update magnitudes while ACER combines advantages in policy optimization and experience replay, improving strategy's stability through trust region optimization. Meanwhile, buffer replay is also adopted to enhance experiential learning.
+
 从表\ref{tab:5.9}可以看出，所提出的多维度策略优化模型（MPLO）在对抗样本生成任务中表现出显著优势。首先，MPLO 的攻击成功率达到了88.7\%，相比于传统的PPO 方法提升了6.4个百分点，也比 ACER 高出了4.2个百分点，说明 MPLO不仅能够更精准地识别出检测器的决策边界，还能针对性地生成更加隐蔽且有效的扰动。
+
+As shown in Table \ref{tab:5.9}, the proposed Multidimensional Policy Optimization (MPLO) model exhibits significant advantages in adversarial sample generation tasks. MPLO's attack success rate reaches 88.7\%, surging 6.4\% higher than traditional PPO methods and 4.2\% than ACER. This result presents that MPLO can not only recognize the decision-making boundaries of detectors more precisely but also target generating perturbations that are more concealed and effective.
 \begin{figure}[hbt]
 	\centering
 	\includegraphics[width=0.75\textwidth]{figures/5.1}
@@ -324,7 +408,11 @@ $\lambda_1= 0.6, \lambda_2 = 0.3, \lambda_3=0.1$
 
 其次，MPLO 在修改代价方面同样具有竞争力。它的平均扰动数为3.8次，仅略高于PPO的3.2次，显著低于ACER的4.1次。这表明，在生成同等数量的对抗样本时，MPLO 能以更少的操作步骤完成目标，减少了对原始文件结构的破坏，提高了生成对抗样本的隐蔽性和功能保留度。
 
+In the modification cost aspect, MPLO are also comparative. Its average perturbation time is 3.8, slightly higher than 3.2 of PPO, extremely lower than 4.1 of ACER, indicating that MPLO can complete the goal with lower operation steps at the premise that different models generate same amount adversarial samples, reducing original file structure disruption, improving the generated samples' concealment and functional retention.
+
 最后，从收敛速度来看，MPLO在4500步时就已实现策略稳定，虽然略慢于PPO（4200步），但明显快于ACER（5000步）。这一表现反映了MPLO 在策略更新和经验利用上的高效平衡：通过多维度策略评估机制，它能在探索和利用之间保持良好节奏，快速逼近最优扰动策略，而无需进行过度的样本回放或过长的训练迭代。
+
+Considering the convergence speed, MPLO achieves policy covergence at 4,500 steps, slower than 4,200 steps of PPO but faster than 5,000 steps of ACER, reflecting that MPLO gets an effective balance between exploration and exploitation. Through multi-dimensional strategy evaluation mechanisms, it can maintain the balance between exploration and exploitation, rapidly approaching optimal disturbance strategies without requiring excess sample replay and exceeding training iterations.
 
 \begin{table}[htbp]
 	\centering
