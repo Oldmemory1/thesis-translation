@@ -574,30 +574,51 @@ Comparison with three single disturbance strategies, MPLO comprehensively introd
 
 The ablation study confirms both independent and synergistic value of each perturbation strategy in MPLO. Individual strategies show partial evasion capabilities but cannot keep stable while facing multiple detection models.Integrating perturbation strategies in a unified framework significantly enhances overall evasion performance, practical applicability, and robustness against diverse detection models.  
 
-
-\section{功能保留研究}
+\section{功能保留研究 Research on Functional Retention}
 
 在对抗性恶意样本生成任务中，保持扰动后的样本依然具备原始功能，是衡量样本有效性和实用价值的重要标准。若样本虽能逃避检测，却失去了原本的恶意行为功能，则其在真实攻击模拟、安全评估及系统对抗训练中的价值将大打折扣。因此，本文对提出的三类扰动方法——结构扰动、指令扰动与行为扰动——分别开展功能保留性研究，系统评估每类扰动对恶意功能完整性的影响。
 
+In adversarial malware sample generation tasks, preserving the original functionality of perturbed samples serves as a critical criterion for evaluating their effectiveness and practical values. Samples that evade detection but lose their malicious functionality diminish their value in real attack scenario simulations, security assessments, and system defense training. Therefore, this study systematically conducts the research on the malicious functionality impact of the three proposed perturbation methods—structural, instructional and behavioral.
+
 （1）结构扰动的功能保留性分析
+
+(1) Functional Preservation Analysis of Structural Perturbation
 
 结构扰动主要作用于程序的元数据与文件结构层面，如段表重排、符号表修改、节区添加与重命名等。这类扰动并不改变程序的指令逻辑或运行流程，因此在理论上不会影响样本的实际执行功能。
 
+Structural perturbation primarily modifies metadata and file structures of programs, such as section table rearrangement, symbol table modification, section addition and section renaming. Such disturbances do not alter the program's instruction logic or execution flow, theoretically maintaining its functional behavior.
+
 在实验中，本文对数百个经过结构扰动处理的恶意样本在受控沙箱中进行自动执行，观测其关键行为特征（如反连行为、键盘监听、文件篡改等）。结果表明，绝大多数结构扰动样本在执行过程中表现出与原样本高度一致的行为特征，功能保留率（Functionality Retention Rate, FRR）达到92.4\%。个别失效样本主要由于过度扰动了加载器相关节区或破坏了符号重定位信息所致，可通过更精细的扰动控制予以修复。
+
+Hundreds of structurally perturbed malware samples were executed in the controlled sandbox to observe their crucial behavioral characteristics (e.g., reverse connections, keystroke logging, and file tampering). The results show that most structurally perturbated samples represent highly identical to the original samples. The functionality retention rate reached 92.4\%. The failure samples are mainly caused by disturbing excessively on sections of the loader or disrupting symbol relocation information. These conditions can be fixed by adopting more intricate disturbance controls.
 
 （2）指令扰动的功能保留性分析
 
+(2) Functional Preservation Analysis of Instructional Perturbation
+
 指令扰动旨在修改程序代码本体，包括等价指令替换、指令重排、插入无操作指令（NOP）、使用跳转替换顺序结构等。该类扰动技术高度依赖语义保持（semantic-preserving）原则，其核心在于不改变程序逻辑的同时最大限度混淆静态指令序列。
+
+Instructional perturbations aim to modify program code, including equivalent replacement of sequential structures with jumps. These techniques highly depend on following semantic-preserving principles to obfuscate static instruction sequences without altering program logic.
 
 利用控制流完整性（CFI）检查、执行路径比对等方式评估指令扰动的功能影响。实验结果显示，96\%以上的样本在扰动后依旧可以正常运行，并实现原始恶意行为，如建立远程通信、窃取数据等。功能保留率达到93.7\%。少数失败样本主要源于对跳转逻辑、栈平衡或调用约定的破坏，提示未来在扰动生成过程中应引入更严格的约束机制，以确保扰动的语义一致性。
 
+Utilizing Control Flow Integrity (CFI) checks and execution path comparison methods, experimental results demonstrate that more than 96\% of samples maintained original malicious behaviors (e.g., establishing remote communication, data exfiltration) after perturbations and the FRR reached 93.7\%. Minor failure samples occurred due to disrupted jump logic, stack imbalance, or calling convention violations, which suggests that future implementations should incorporate stricter constraints for semantic consistency.
+
 （3）行为扰动的功能保留性分析
+
+(3) Functional Preservation Analysis of Behavioral Perturbation
 
 行为扰动通过延迟恶意行为的触发、插入混淆控制流、依赖特定条件执行等方式干扰行为分析工具的检测窗口。这种策略改变的是恶意行为的触发机制而非其具体逻辑，因此其功能保留性具有一定的条件性。
 
+Behavioral perturbations interfere with behavioral analysis tools by delaying malicious behavior triggers, inserting obfuscated control flows, and introducing conditional execution dependencies. This strategy alters the triggering mechanism rather than the core malicious logic, resulting in conditional functionality preservation.
+
 在实验中，本文对扰动后的样本进行加长执行时间操作，验证其是否仍能触发原始恶意行为。结果显示，98\%的行为扰动样本能够在设置合理触发条件后完全复现原始恶意行为。
 
+In this research, prolonging disturbed samples' execution time verifies whether the original malicious behaviors can be triggered. The results show that 98\% of behaviorally perturbed samples fully replicated original malicious behaviors under appropriately configured trigger conditions.
+
 为全面对比三类扰动的功能保留效果，本文统计了每类扰动样本的成功执行率及功能保留率，结果如下表\ref{tab:5.12}所示。
+
+To comprehensively compare functional retention results of three perturbation strategies, this research compile statistics on each sample's success execution rate and functional retention rate. The results are provided in Table \ref{tab:5.12}.
 
 \begin{table}[htb]
 	\centering
@@ -615,6 +636,8 @@ The ablation study confirms both independent and synergistic value of each pertu
 \end{table}
 
 从结果可以看出，结构扰动在不破坏程序逻辑的前提下具有很好的功能保留性；指令扰动在合理控制下也能维持较高功能一致性；行为扰动由于引入了复杂触发机制，成功率有所下降，但功能保留性最高。
+
+All in all, structural perturbation maintains high functionality retention without disrupting program logic. Instructional perturbation achieves strong consistency under controlled constraints. Behavioral perturbation, despite lower execution success rates due to complex triggering mechanisms, exhibits the highest functionality retention capability.
 
 \section{样本迁移性研究}
 
