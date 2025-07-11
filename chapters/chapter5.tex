@@ -639,12 +639,15 @@ To comprehensively compare functional retention results of three perturbation st
 
 All in all, structural perturbation maintains high functionality retention without disrupting program logic. Instructional perturbation achieves strong consistency under controlled constraints. Behavioral perturbation, despite lower execution success rates due to complex triggering mechanisms, exhibits the highest functionality retention capability.
 
-\section{样本迁移性研究}
+\section{样本迁移性研究 Research on Sample Transferability}
 
 为了进一步验证本文所提出的多架构对抗样本生成方法在真实检测环境中的有效性，本文开展了样本迁移性研究，将生成的对抗样本上传至公共在线恶意软件检测平台VirusTotal，评估其在不同商用反病毒引擎下的实际逃避能力。该实验旨在考察对抗样本从本地检测系统向多引擎平台的迁移能力，即：在本地检测模型中成功逃避的样本是否同样能够在第三方检测平台中保持对抗性。
 
+To further validate the effectiveness of the proposed multi-architecture adversarial sample generation method in real detection environments, this research evaluates sample transferability. Adversarial samples were submitted to the public online malware detection platform VirusTotal to analyze their practical evasion capabilities among different commercial antivirus engines. This experiment examines whether samples that successfully evade the local detection model can retain adversarial properties on the third-party detection platforms.
 
 本实验从经过结构扰动、指令扰动和行为扰动处理的对抗样本中，分别选取代表性样本进行测试，并与未扰动的原始恶意样本进行对比。所有样本均上传至 VirusTotal 平台进行静态和动态联合扫描，记录各引擎的检测结果，统计每个样本的被检测引擎数量（即“命中率”），作为衡量迁移逃避能力的标准。
+
+This research selects representative samples from adversarial samples modified by structural perturbations, instructional perturbations, and behavioral perturbations, and compares them with original malicious samples without modification. All samples were uploaded to VirusTotal for static and dynamic scanning. Detection results from each engine were recorded. The number of engines detecting each sample (i.e., "hit rate") was collected as the metric for evasion capability.
 
 \begin{figure}[htbp]
 	\centering
@@ -655,6 +658,8 @@ All in all, structural perturbation maintains high functionality retention witho
 
 
 为更好地展示免杀效果，此处定义Virustotal检测率$v_t$为可检测到样本恶意性的杀毒引擎数占总杀毒引擎数之比，如下计算： 
+
+To better illustrate the evasion effect, the VirusTotal detection rate $v_t$ is defined as the ratio of antivirus engines detecting maliciousness to the total number of engines, calculated as the formulation below:
 \begin{equation}
 v_t = \frac{D_e}{A_e}
 \tag{5.9}
@@ -662,7 +667,11 @@ v_t = \frac{D_e}{A_e}
 
 其中$D_e$为可检测到样本恶意性的杀毒引擎数，$A_e$为总杀毒引擎数。
 
+$D_e$ is the number of antivirus engines detecting maliciousness, while $A_e$ presents the total number of antivirus engines.
+
 表\ref{tab:5.13}列举了20个样本在VirusToal网站上免杀前检测率$v_{t1}$、免杀后检测率$v_{t2}$以及下降率$vt_{down}$。
+
+Table \ref{tab:5.13} lists the detection rates $v_{t1}$ before evasion, $v_{t2}$ after evasion, and the decline rate $vt_{down}$ of20 samples on VirusTotal.
 
 \begin{table}[htbp]
 	\centering
@@ -716,27 +725,39 @@ v_t = \frac{D_e}{A_e}
 
 实验结果表明，经过扰动处理的对抗样本在 VirusTotal 平台上的总体检测率相比原始样本显著降低，表现出较强的迁移性。其中，结构扰动样本的逃避能力最为稳定，多个依赖静态分析特征的引擎未能识别其恶意特征；指令扰动样本在部分引擎中表现出一定逃避效果，但整体变异幅度相对较小；行为扰动样本在动态检测能力较弱的引擎中效果较好，但在支持沙箱分析的引擎中仍存在部分命中情况，说明其对动态特征的干扰存在一定的平台依赖性。
 
+Experimental results indicate that adversarial samples processed by perturbation exhibit extremely lower overall detection rates on VirusTotal than original samples, exhibiting strong transferability. Structural perturbations achieved the most stable evasion, with multiple static analysis-dependent engines failing to identify malicious features. Instructional perturbations showed limited evasion across engines, yielding relatively overall smaller variations. Behavioral perturbations effectively evaded engines with weaker dynamic detection capabilities, but there still exist partial detections in engines supporting sandbox analysis. The limitation shows platform-specific dependencies in dynamic feature interference.
+
 此外，不同扰动方式对引擎类型的影响也存在差异。结构扰动主要干扰依赖程序结构解析和静态特征提取的引擎，指令扰动则影响基于指令签名和机器学习模型的检测器，行为扰动更容易绕过基于沙箱执行路径和行为模式的动态检测机制。该实验结果进一步验证了对抗扰动在多引擎、跨平台检测环境下的适应性与实际应用价值。
 
+Furthermore, different perturbation methods affected engine types distinctly. Structural perturbation primarily disrupted engines relying on static structure parsing and feature extraction. Instructional perturbation impacted detectors based on instructional signatures or machine learning models. Behavioral perturbation more readily evaded dynamic mechanisms based on sandbox execution paths and behavioral patterns. These results further validate the adaptability and practical utility of adversarial perturbations in multi-engine, cross-platform detection environments.
 
 本文生成的对抗样本不仅能够在本地检测模型中实现有效规避，同时也能在真实检测平台中表现出良好的迁移能力，具备较强的跨平台逃逸效果，为对抗性恶意软件研究和实战应用提供了有力支撑。
 
+The adversarial samples generated in this research not only achieve effective evasion in local detection models but also demonstrate strong transferability in real detection platforms, exhibiting robust cross-platform escape effects. This provides solid support for adversarial malware research and practical applications.
+
 为了更系统地分析本文方法与现有研究之间的差异与优势，表\ref{tab:5.14}从多个角度对比了当前典型对抗性恶意样本生成工作与本研究的技术特征和实验效果，涵盖了病毒类型、攻击方式、检测模型数量以及平均免杀率四个关键维度，定性与定量地展示了本文工作的综合性能。
+
+To systematically analyze the differences and advantages between the proposed method in this experiment and existing research, Table \ref{tab:5.14} compares current typical adversarial malware sample generation works with this research across four key dimensions: virus types, attack methods, number of detection models, and average evasion rate. This table qualitatively and quantitatively describes the comprehensive performance of this work.
 
 在病毒类型方面，已有多数研究主要聚焦于 Windows 平台下的 PE 病毒或移动平台上的 Android 病毒，对 Linux 平台 ELF 格式恶意代码的研究相对稀缺。相比之下，本文专注于 ELF 病毒的对抗样本生成与逃逸效果评估，有效填补了该领域的研究空白。
 
+In the virus type aspect, most existing studies concentrate primarily on PE viruses in Windows platforms or Android viruses in mobile platforms, with relatively scarce research on in the ELF format malware in Linux platforms. In contrast, this study focuses on adversarial sample generation and escape effect evaluation for ELF virus realm. This research effectively fills this research gap of ELF adversarial malware generation.
+
 在攻击方式方面，本文所提出的方法与文献\cite{rathore2021identification}属于白盒攻击方式，需了解检测模型的特征提取方式和训练数据分布等内部信息。而文献\cite{kolosnjaji2018adversarial,quertier2022merlin,song2022mab} 类似，均采用黑盒攻击模式，无需依赖检测模型的内部结构，仅通过输入输出结果进行扰动优化。
+
+Comparing attack methods, the approach issued in this paper belongs to the white-box attack category, like the method in literature \cite{rathore2021identification}. The white-box attack requires knowledge of internal information such as the feature extraction methods and training data distribution of the detection model. Different from this research, some literatures \cite{kolosnjaji2018adversarial,quertier2022merlin,song2022mab} employs a black-box attack pattern. Unlike white-box attack, black-box attack eliminates dependency on the internal structure of detection models and optimizes disturbances solely through input and output results.
 
 相比之下，另一项基于强化学习的自动生成 ELF 对抗恶意样本的方法\cite{xue2024reinforcement}，结合了多轮特征提取、恶意检测与智能决策的闭环机制，利用 PPO 算法在 Linux x86 平台实现了对 ELF 恶意样本的有效扰动与免杀。
 
+In Comparison, another method for automatically generating ELF adversarial malware samples based on RL\cite{xue2024reinforcement} incorporates a multi-loop mechanism combining multi-round feature extraction, malware detection, and intelligent decision-making. Utilizing the PPO algorithm, it achieves effective perturbation and evasion of ELF malware samples on the Linux x86 platform.
+
 虽然该方法与本文均采用强化学习框架，但本文更侧重于多维度的大规模评估，覆盖62个检测引擎，强调了方法的广泛适用性和鲁棒性；同时本文在动作空间设计、特征选择及攻击策略上进行了改进，实现了更高的平均免杀率，体现了方法在实际应用中的竞争优势。
+
+Although both this method and the method issued in research adopts reinforcement learning frameworks, the present work focuses more on multidimensional large-scale evaluation, covering 62 detection engines to emphasize broad applicability and robustness. Simultaneously, improvements in action space design, feature selection, and attack strategies have been updated. This innovation results in a higher average evasion rate and reflects the competitive advantage of the approach in practical applications.
 
 在平均免杀率方面，本文所生成的对抗样本在 VirusTotal 平台中取得了 84.5\% 的免杀率，优于其他研究的平均水平。这表明本文提出的对抗扰动策略在逃逸检测方面具有更强的效果。
 
-
-
-
-
+In terms of average evasion rate, the adversarial samples generated in this research achieved 84.5\% evasion rate on the VirusTotal platform, surpassing the average levels reported in other studies. This indicates that the proposed adversarial perturbation strategy demonstrates stronger effectiveness in evading detection.
 
 \section{本章小结}
 
