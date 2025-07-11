@@ -759,8 +759,8 @@ Although both this method and the method issued in research adopts reinforcement
 
 In terms of average evasion rate, the adversarial samples generated in this research achieved 84.5\% evasion rate on the VirusTotal platform, surpassing the average levels reported in other studies. This indicates that the proposed adversarial perturbation strategy demonstrates stronger effectiveness in evading detection.
 
-\section{本章小结}
+\section{本章小结 Chapter Summary}
 
 本章在统一的软硬件与数据集条件下，先对PPO、ACER及Baseline方法与所提出的多维度策略优化模型（MPLO）在不同LSTM层数与隐藏层规模配置下的逃逸成功率、扰动次数和收敛速度进行了深入对比，继而通过消融实验评估了结构扰动、指令扰动与行为扰动三种策略的独立效果及其组合增益，并结合沙箱执行与控制流完整性检测检验了各类扰动对恶意功能保留的影响；最后，将生成的对抗样本上传至VirusTotal平台，对比了免杀前后检测率及下降幅度，以全面验证模型在跨引擎环境中的迁移逃逸能力。实验结果显示，MPLO 表现出更高的攻击成功率、更低的扰动成本、更快的收敛速度及更强的跨平台迁移性能。
 
-
+Ensuring unified hardware, software, and dataset conditions, this chapter conducted a comparison of the PPO, ACER, and Baseline methods with the proposed Multidimensional Policy Optimization (MPLO) model. Then this chapter analyzed the evasion success rate, perturbation frequency, and convergence speed in different LSTM layers and hidden layer sizes, then it evaluated the independent effects and combined gains of structural perturbation, instructional perturbation, and behavioral perturbation through ablation experiments. This analysis was combined with sandbox execution and Control Flow Integrity (CFI) testing to examine the influence of each disturbance type on malicious functionality preservation. Finally, the generated adversarial samples were uploaded to the VirusTotal platform to compare detection rates and decline magnitudes before and after evasion to comprehensively assess the model's transfer evasion capability across detection engines. Experimental results demonstrate that MPLO achieves higher attack success rates, lower disturbance costs, faster convergence speed, and stronger cross-platform transfer performance.
