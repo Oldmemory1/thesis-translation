@@ -300,6 +300,7 @@ LSTM的关键是通过这三个门的配合，实现对信息流的精确控制�
 LSTM的这种设计使得它可以在长序列中持续保留有效信息，并忽略无关部分，克服了传统RNN在长距离依赖建模方面的劣势。
 
 The key to LSTM is that the cooperation of these three gates enables LSTM to control the information flow precisely, retaining useful information for model predictions while discarding irrelevant or redundant data. Its information flow is described as follows: First, the forget gate decides which old information should be discarded based on current input and previous hidden state; Second, the input gate determines how much new input should be written into the memory cell; Third, the memory state updates; Finally, the output gate generates a hidden state from current memory state for passing to the next time step.
+This design can make LSTM continuously retain valid information in long sequences and ignore irrelevant parts, overcoming the disadvantages of traditional RNN in modeling dependency on long-term.
 
 \begin{figure}[hbt]
 	\centering
